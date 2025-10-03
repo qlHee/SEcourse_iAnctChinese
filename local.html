@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本地文件 - iAnctChinese</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">iAnctChinese</div>
+    <ul class="nav-links">
+      <li><a href="index.html">主页</a></li>
+      <li><a href="#" id="logoutBtn">退出登录</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h2>本地文件列表</h2>
+    <div id="localFileDisplay"></div>
+    <button id="loadLocalBtn">加载本地文件</button>
+
+    <!-- 文档显示区 -->
+    <div id="docContent" class="doc-content" contenteditable="true"></div>
+
+    <!-- 高亮/批注控制区 -->
+    <div class="highlight-controls">
+      <label>颜色：</label>
+      <select id="highlightColor">
+        <option value="yellow">黄色</option>
+        <option value="lightgreen">绿色</option>
+        <option value="pink">粉色</option>
+        <option value="lightblue">蓝色</option>
+      </select>
+      <button id="highlightBtn">标注</button>
+      <button id="addCommentBtn">批注</button>
+      <button id="clearHighlightBtn">取消标记</button>
+      <button id="downloadBtn">下载文件</button>
+    </div>
+
+    <h3>批注列表</h3>
+    <div id="commentList" class="comment-list"></div>
+  </main>
+
+  <script src="main.js"></script>
+  <script>
+   
+    const loadLocalBtn = document.getElementById("loadLocalBtn");
+    const docContent = document.getElementById("docContent");
+    const commentList = document.getElementById("commentList");
+
+    const localFiles = [
+      { id: "doc1", name: "doc1.txt", content: "这是第一个文档，内容是：今天天气很好，适合学习前端。" },
+      { id: "doc2", name: "doc2.txt", content: "这是第二个文档，内容是：人工智能正在快速发展，未来可期。" }
+    ];
+
+    loadLocalBtn.addEventListener("click", function() {
+      docContent.innerHTML = "";
+      commentList.innerHTML = "";
+
+      localFiles.forEach(file => {
+        const fileBox = document.createElement("div");
+        fileBox.className = "local-file-box";
+        fileBox.innerHTML = `<strong>${file.name}</strong>`;
+        fileBox.addEventListener("click", () => {
+          
+          docContent.innerHTML = file.content
+            .split("\n")
+            .map(line => `<p>${line}</p>`)
+            .join("");
+          commentList.innerHTML = "";
+        });
+        document.getElementById("localFileDisplay").appendChild(fileBox);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上传文件 - iAnctChinese</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">iAnctChinese</div>
+    <ul class="nav-links">
+      <li><a href="index.html">主页</a></li>
+      <li><a href="local.html">本地文件</a></li>
+      <li><a href="#" id="logoutBtn">退出登录</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h2>上传文件</h2>
+    <input type="file" id="uploadFile" accept=".txt,.md">
+    
+    
+    <div id="uploadFileDisplay" class="doc-content" contenteditable="true"></div>
+
+    
+    <div class="highlight-controls">
+      <label>颜色：</label>
+      <select id="highlightColor">
+        <option value="yellow">黄色</option>
+        <option value="lightgreen">绿色</option>
+        <option value="pink">粉色</option>
+        <option value="lightblue">蓝色</option>
+      </select>
+      <button id="highlightBtn">标注</button>
+      <button id="addCommentBtn">批注</button>
+      <button id="clearHighlightBtn">取消标记</button>
+      <button id="downloadBtn">下载文件</button>
+    </div>
+
+    <h3>批注列表</h3>
+    <div id="commentList" class="comment-list"></div>
+  </main>
+
+  <script src="main.js"></script>
+  <script>
+    // 上传文件
+    const uploadFile = document.getElementById("uploadFile");
+    const display = document.getElementById("uploadFileDisplay");
+    const commentList = document.getElementById("commentList");
+
+    uploadFile.addEventListener("change", function() {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        // 拆行显示，每行 <p> 包裹
+        display.innerHTML = text
+          .split("\n")
+          .map(line => `<p>${line}</p>`)
+          .join("");
+        // 清空批注
+        commentList.innerHTML = "";
+      }
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文档标注 - iAnctChinese</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">iAnctChinese</div>
+    <ul class="nav-links">
+      <li><a href="index.html">主页</a></li>
+      <li><a href="local.html">本地文件</a></li>
+      <li><a href="upload.html">上传文件</a></li>
+      <li><a href="#" id="logoutBtn">退出登录</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h2 id="docTitle">文档标注</h2>
+    <div id="docContent" class="doc-content"></div>
+    
+    <div class="tips">选中文字后，选择颜色标注或添加批注</div>
+    
+    <div class="highlight-controls">
+      <label>颜色：</label>
+      <select id="highlightColor">
+        <option value="yellow">黄色</option>
+        <option value="lightgreen">绿色</option>
+        <option value="pink">粉色</option>
+        <option value="lightblue">蓝色</option>
+      </select>
+      <button id="highlightBtn">标注</button>
+      <button id="addCommentBtn">批注</button>
+      <button id="clearHighlightBtn">取消标记</button>
+      <button id="backBtn">返回本地文件</button>
+    </div>
+
+    <h3>批注列表</h3>
+    <div id="commentList" class="comment-list"></div>
+  </main>
+
+  <script src="main.js"></script>
+  <script>
+    
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get("id");
+
+    
+    const file = window.getFileById(docId);
+    if (file) {
+      document.getElementById("docTitle").textContent = file.name;
+      document.getElementById("docContent").textContent = file.content;
+    }
+
+    // 高亮标注
+    document.getElementById("highlightBtn").addEventListener("click", () => {
+      const selection = window.getSelection();
+      if (!selection.toString()) { alert("请先选择一些文字！"); return; }
+      const range = selection.getRangeAt(0);
+      const span = document.createElement("span");
+      span.className = "highlight";
+      span.style.backgroundColor = document.getElementById("highlightColor").value;
+      range.surroundContents(span);
+      selection.removeAllRanges();
+    });
+
+    // 批注功能
+    const commentList = document.getElementById("commentList");
+    document.getElementById("addCommentBtn").addEventListener("click", () => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      if (!text) { alert("请先选择一些文字！"); return; }
+
+      // 创建批注条
+      const commentDiv = document.createElement("div");
+      commentDiv.className = "comment-item";
+      commentDiv.innerHTML = `
+        <div class="comment-selected">选中内容：<strong>${text}</strong></div>
+        <textarea placeholder="输入你的批注"></textarea>
+        <button class="deleteCommentBtn">删除批注</button>
+      `;
+      commentList.appendChild(commentDiv);
+
+      // 删除按钮
+      commentDiv.querySelector(".deleteCommentBtn").addEventListener("click", () => {
+        commentDiv.remove();
+      });
+
+      selection.removeAllRanges();
+    });
+
+    // 取消所有标注
+    const clearBtn = document.getElementById("clearHighlightBtn");
+    clearBtn.addEventListener("click", () => {
+      const contentDiv = document.getElementById("docContent");
+      const highlights = contentDiv.querySelectorAll("span.highlight");
+      highlights.forEach(span => {
+        const parent = span.parentNode;
+        while(span.firstChild) parent.insertBefore(span.firstChild, span);
+        parent.removeChild(span);
+      });
+    });
+
+    // 返回按钮
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "local.html";
+    });
+  </script>
+</body>
+</html>

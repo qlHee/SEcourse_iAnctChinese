@@ -1,0 +1,101 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: sans-serif; background:#f9f9f9; }
+
+
+.navbar {
+  background:#3498db; color:white;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:15px 30px;
+}
+.navbar .logo { font-size:1.5rem; font-weight:bold; }
+.navbar .nav-links { list-style:none; display:flex; gap:20px; }
+.navbar .nav-links a { color:white; text-decoration:none; }
+.navbar .nav-links a:hover { text-decoration:underline; }
+
+
+.container {
+  max-width:800px; margin:30px auto; background:white;
+  padding:30px; border-radius:8px; box-shadow:0px 5px 15px rgba(0,0,0,0.1);
+}
+.container h2 { margin-bottom:20px; text-align:center; }
+
+
+.file-display {
+  margin-top:10px; padding:10px;
+  border:1px dashed #ccc; border-radius:5px;
+  min-height:40px; background:#f5f5f5; font-size:0.9rem; color:#555;
+}
+.local-file-box {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 15px;
+  background: #fdfdfd;
+}
+.local-file-box a { text-decoration:none; color:#3498db; font-weight:bold; }
+.local-file-box a:hover { text-decoration:underline; }
+
+/* 文档内容 + 标注 */
+.doc-content {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+  background: #fdfdfd;
+  min-height: 150px;
+  line-height: 1.6;
+}
+
+.highlight-controls {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.highlight {
+  color: black;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background-color: inherit;
+}
+
+.tips {
+  margin: 10px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.comment-list {
+  margin-top: 10px;
+}
+.comment-item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background: #f9f9f9;
+}
+.comment-item textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 5px;
+  font-size: 0.9rem;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+.comment-item button {
+  margin-top: 5px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.comment-item button:hover {
+  background-color: #c0392b;
+}
+

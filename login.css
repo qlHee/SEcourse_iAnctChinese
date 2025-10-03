@@ -1,0 +1,93 @@
+* {
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f9f9f9;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.login-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+  max-width: 400px;
+  width: 100%;
+  padding: 30px;
+  overflow: hidden;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.2rem; 
+}
+
+.form-item {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+label {
+  display:block;
+  margin-bottom: 5px;
+  color: #555;
+  font-weight: bold;
+}
+
+input {
+  border: 2px solid #f0f0f0;
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+  padding:10px;
+  font-size:14px;
+}
+
+input:focus {
+  outline:none;
+  border-color: #3498db;
+}
+
+small {
+  visibility: hidden;
+  position: absolute;
+  bottom: -18px;
+  left:0;
+  font-size: 12px;
+}
+
+button {
+  cursor:pointer;
+  background-color: #3498db;
+  border: none;
+  color: white;
+  display: block;
+  font-size: 1rem;
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+.form-item.error input {
+  border-color: #e74c3c;
+}
+
+.form-item.success input {
+  border-color: #2ecc71;
+}
+
+.form-item.error small {
+  visibility: visible;
+  color: #e74c3c;
+}
