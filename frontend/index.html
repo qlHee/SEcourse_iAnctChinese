@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iAnctChinese - 智能中文古籍标注平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-book"></i> iAnctChinese
+                </a>
+                <span class="navbar-text">智能古籍标注平台 - 体验"吾与点"的从容治学</span>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>文档管理</h5>
+                        </div>
+                        <div class="card-body">
+                            <button class="btn btn-primary btn-sm mb-3" onclick="createNewDocument()">
+                                <i class="fas fa-plus"></i> 新建文档
+                            </button>
+                            <div id="document-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>标注标签</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="tag-list"></div>
+                            <button class="btn btn-outline-secondary btn-sm mt-2" onclick="showAddTagForm()">
+                                <i class="fas fa-tag"></i> 添加标签
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="col-md-9">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 id="document-title">请选择或创建文档</h5>
+                            <div>
+                                <button class="btn btn-success btn-sm" onclick="autoSegment()" id="segment-btn">
+                                    <i class="fas fa-magic"></i> 自动分词
+                                </button>
+                                <button class="btn btn-info btn-sm ms-2" onclick="exportAnnotations()">
+                                    <i class="fas fa-download"></i> 导出标注
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- 标注工具栏 -->
+                            <div id="annotation-toolbar" class="mb-3" style="display: none;">
+                                <div class="btn-group" id="tag-buttons"></div>
+                                <span id="selected-text" class="ms-3 text-muted"></span>
+                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="clearSelection()">
+                                    <i class="fas fa-times"></i> 取消
+                                </button>
+                            </div>
+
+                            <!-- 文本标注区域 -->
+                            <div id="text-container" class="text-container">
+                                <p class="text-muted">请在上方选择或创建文档开始标注</p>
+                            </div>
+
+                            <!-- 标注统计 -->
+                            <div id="annotation-stats" class="mt-3" style="display: none;">
+                                <h6>标注统计</h6>
+                                <div id="stats-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文档模态框 -->
+    <div class="modal fade" id="documentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="documentModalLabel">新建文档</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="documentForm">
+                        <div class="mb-3">
+                            <label class="form-label">文档标题</label>
+                            <input type="text" class="form-control" id="docTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">文档内容</label>
+                            <textarea class="form-control" id="docContent" rows="10" required></textarea>
+                            <small class="form-text text-muted">可粘贴《论语》等古籍文本</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDocument()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 标签模态框 -->
+    <div class="modal fade" id="tagModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加新标签</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tagForm">
+                        <div class="mb-3">
+                            <label class="form-label">标签名称</label>
+                            <input type="text" class="form-control" id="tagName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">标签颜色</label>
+                            <input type="color" class="form-control" id="tagColor" value="#ff6b6b" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述（可选）</label>
+                            <input type="text" class="form-control" id="tagDescription">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTag()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+</html>

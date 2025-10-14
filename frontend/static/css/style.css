@@ -1,0 +1,90 @@
+body {
+    font-family: 'SimSun', 'STKaiti', serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.text-container {
+    min-height: 400px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background: #f8f9fa;
+    line-height: 2;
+    font-size: 16px;
+    white-space: pre-wrap;
+}
+
+.annotation {
+    background-color: rgba(255, 255, 0, 0.3);
+    border-bottom: 2px solid;
+    padding: 1px 2px;
+    margin: 0 1px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.annotation:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.annotation.selected {
+    background-color: #007bff !important;
+    color: white;
+}
+
+.tag-badge {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.segment {
+    padding: 1px 2px;
+    margin: 0 1px;
+    cursor: pointer;
+}
+
+.segment:hover {
+    background-color: #e9ecef;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    padding: 5px;
+    background: #f8f9fa;
+    border-radius: 3px;
+}
+
+.stat-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.document-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.document-item:hover {
+    background-color: #f8f9fa;
+}
+
+#annotation-toolbar {
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
