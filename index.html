@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>iAnctChinese-Client2</title>
+  <style>
+    /* ======== 全局风格 ======== */
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px;
+    }
+
+    .container {
+      width: 700px;
+      background: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      padding: 30px 40px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-top: 0;
+      margin-bottom: 25px;
+    }
+
+    /* ======== 输入区 ======== */
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: all 0.3s;
+      resize: none;
+    }
+
+    textarea:focus {
+      border-color: #409eff;
+      box-shadow: 0 0 5px rgba(64, 158, 255, 0.4);
+    }
+
+    /* ======== 按钮样式 ======== */
+    .btn-group {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    button {
+      background-color: #409eff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      margin: 0 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #66b1ff;
+    }
+
+    /* ======== 分词展示区 ======== */
+    h3 {
+      margin-top: 25px;
+      color: #444;
+      border-left: 4px solid #409eff;
+      padding-left: 10px;
+    }
+
+    #words {
+      margin-top: 15px;
+      background: #f9fafc;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      min-height: 100px;
+    }
+
+    .word {
+      display: inline-block;
+      border: 1px solid #d0d0d0;
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin: 5px;
+      cursor: pointer;
+      background-color: #ffffff;
+      transition: all 0.2s;
+    }
+
+    .word:hover {
+      background-color: #ecf5ff;
+      border-color: #409eff;
+      transform: scale(1.05);
+    }
+
+    .word.editing {
+      background: #d9ecff;
+      border-color: #409eff;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>iAnctChinese-Client2</h2>
+
+    <textarea id="inputText" placeholder="请输入要分词的中文文本..."></textarea>
+
+    <div class="btn-group">
+      <button onclick="segmentText()">自动分词</button>
+      <button onclick="saveAnnotation()">保存标注</button>
+    </div>
+
+    <h3>分词结果：</h3>
+    <div id="words"></div>
+
+    <footer>© 2025 iAnctChinese-Client2 | Demo 版</footer>
+  </div>
+
+  <script>
+    let wordList = [];
+
+    async function segmentText() {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) {
+        alert("请输入文本后再进行分词。");
+        return;
+      }
+
+      const res = await fetch("http://127.0.0.1:5000/api/segment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await res.json();
+      wordList = data.words.map(w => ({ text: w, label: "" }));
+      renderWords();
+    }
+
+    function renderWords() {
+      const container = document.getElementById("words");
+      container.innerHTML = "";
+
+      if (wordList.length === 0) {
+        container.innerHTML = "<p style='color:#999'>暂无分词结果，请输入文本后点击“自动分词”。</p>";
+        return;
+      }
+
+      wordList.forEach((word, idx) => {
+        const span = document.createElement("span");
+        span.className = "word";
+        span.innerText = word.label ? `${word.text}【${word.label}】` : word.text;
+
+        span.onclick = () => {
+          const label = prompt("请输入标注（例如：人名 / 地名 / 机构）：", word.label);
+          if (label !== null) {
+            wordList[idx].label = label.trim();
+            renderWords();
+          }
+        };
+
+        container.appendChild(span);
+      });
+    }
+
+    async function saveAnnotation() {
+      if (wordList.length === 0) {
+        alert("还没有分词结果可保存。");
+        return;
+      }
+
+      const res = await fetch("http://127.0.0.1:5000/api/annotate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ annotations: wordList })
+      });
+
+      const data = await res.json();
+      alert(data.message || "保存成功！");
+    }
+  </script>
+</body>
+</html>
