@@ -1,0 +1,253 @@
+/* 使 Document 列表样式与 HomeContent 保持一致的视觉风格 */
+.document-list-container {
+  border: 2px solid #d1d5db;
+  border-radius: 12px;
+  padding: 24px;
+  /* background-color: #ffffff; */
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+
+  --control-height: 40px; /* 全局控件高度（按钮/标题行） */
+}
+
+/* 顶部区域，标题与操作按钮 */
+.document-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.document-list-title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.document-list-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 统一按钮样式（与 HomeContent 保持一致） */
+.document-list-actions .action-btn,
+.document-actions .action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #e5e7eb;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.document-list-actions .action-btn:hover,
+.document-actions .action-btn:hover {
+  background-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.document-list-actions .primary-btn {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.document-list-actions .primary-btn:hover {
+  background-color: #2563eb;
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
+
+/* 文档列表容器 */
+.document-list-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.document-card {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.document-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.document-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.document-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.document-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-height);
+}
+
+.document-detail {
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 400;
+  max-width: 40ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.document-meta {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.document-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.document-actions .action-btn {
+  padding: 6px 10px;
+}
+
+.document-actions .doc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: var(--control-height);
+  border-radius: 6px;
+  border: none;
+  background-color: #e5e7eb;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .document-title-row {
+    height: auto;
+    align-items: baseline;
+  }
+  .document-actions .doc-btn {
+    height: auto;
+    padding: 6px 12px;
+  }
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .document-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .document-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .document-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+/* 编辑器视图 */
+.document-editor-container {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
+}
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+}
+.editor-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+.editor-tabs {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+.tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.tab-btn.active {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+.editor-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.editor-body {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+.editor-column {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  padding: 12px;
+  border-radius: 8px;
+  min-height: 320px;
+}
+.left-col, .right-col {
+  flex: 1;
+  max-width: 25%;
+}
+.center-col {
+  flex: 2;
+}
+.editor-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  border: none;
+  resize: vertical;
+  outline: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Segoe UI Mono', 'Roboto Mono', 'Helvetica Neue', monospace;
+}
+
+@media (max-width: 900px) {
+  .left-col, .right-col { display: none; }
+  .center-col { flex: 1; }
+}

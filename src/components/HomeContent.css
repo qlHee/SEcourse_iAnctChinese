@@ -1,0 +1,168 @@
+/* 容器边框 */
+.home-content {
+  border: 2px solid #d1d5db;
+  border-radius: 12px;
+  padding: 24px;        /* 内部间距 */
+  background-color: #ffffff;
+  box-sizing: border-box;
+  width: 100%;           /* 占满 main 内宽度，自适应 */
+  max-width: 100%;       /* 防止超出 main */
+  --control-height: 40px; /* 全局控件高度（按钮/标题行） */
+}
+
+
+/* 标题区 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px; /* 垂直方向由高度控制 */
+  height: var(--control-height);
+  background-color: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.create-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* 项目列表 */
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 项目卡片 */
+.project-card {
+  background-color: #f9fafb; /* 让卡片与边框主体区区分 */
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.project-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.project-name {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.project-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-height);
+}
+
+.project-detail {
+  font-size: 13px;
+  color: #9ca3af; /* 更浅的灰色 */
+  font-weight: 400;
+  max-width: 40ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-date {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.project-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px; /* 垂直由高度控制 */
+  height: var(--control-height);
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #e5e7eb;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.action-btn:hover {
+  background-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.delete-btn:hover {
+  background-color: #dc2626;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .project-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .project-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* 在窄屏上取消固定高度以允许换行显示 */
+  .project-title-row {
+    height: auto;
+    align-items: baseline;
+  }
+
+  .create-btn,
+  .action-btn {
+    height: auto;
+    padding: 6px 12px;
+  }
+}
+
