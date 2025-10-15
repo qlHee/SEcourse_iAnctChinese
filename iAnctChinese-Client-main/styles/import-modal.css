@@ -1,0 +1,90 @@
+/* styles/import-modal.css */
+/* Import modal styles are included in modal-form.css */
+/* This file is kept for consistency with the original structure */
+
+.import-modal {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 500px;
+    max-width: 90%;
+    min-width: 400px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+.upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+
+.upload-area:hover {
+    border-color: #3b82f6;
+    background: #f0f9ff;
+}
+
+.upload-area.dragover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: scale(1.02);
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    color: #9ca3af;
+}
+
+.upload-area:hover .upload-icon {
+    color: #3b82f6;
+}
+
+.upload-content p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.file-list {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-name {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.file-size {
+    font-size: 12px;
+    color: #6b7280;
+}
