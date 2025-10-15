@@ -344,7 +344,7 @@ class UIManager {
     }
 
     async callSegmentAPI(text) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:3000') + '/api/segment';
+        const endpoint = (window.IANCT_SEG_BASE || 'http://localhost:5001') + '/api/segment';
         const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -474,7 +474,7 @@ class UIManager {
         feather.replace();
     }
     async callAnalyzeAPI(text) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:3000') + '/api/analyze';
+        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5000') + '/api/analyze';
         const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
