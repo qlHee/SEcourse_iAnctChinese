@@ -545,10 +545,25 @@ class UIManager {
                             <strong>DeepSeek-V3</strong> <span style="color:#10b981;font-size:12px;">(推荐)</span>
                             <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">最新V3模型，速度快，效果好</div>
                         </label>
-                        <label style="display:block;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
                             <input type="radio" name="model" value="deepseek-reasoner" style="margin-right:8px;">
                             <strong>DeepSeek-R1</strong>
                             <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">推理模型，深度分析，速度较慢</div>
+                        </label>
+                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                            <input type="radio" name="model" value="qwen-max" style="margin-right:8px;">
+                            <strong>Qwen-Max</strong>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">通义千问最强模型</div>
+                        </label>
+                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                            <input type="radio" name="model" value="qwen-plus" style="margin-right:8px;">
+                            <strong>Qwen-Plus</strong>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">性价比高，效果优秀</div>
+                        </label>
+                        <label style="display:block;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                            <input type="radio" name="model" value="qwen-turbo" style="margin-right:8px;">
+                            <strong>Qwen-Turbo</strong>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">响应速度快</div>
                         </label>
                     </div>
                     <div style="display:flex;gap:12px;justify-content:flex-end;">
