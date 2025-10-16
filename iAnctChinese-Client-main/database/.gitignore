@@ -1,9 +1,0 @@
-# 忽略数据库文件（包含用户数据）
-*.db
-*.db-journal
-*.sqlite
-*.sqlite3
-
-# 但保留示例数据库（如果有）
-!example.db
-

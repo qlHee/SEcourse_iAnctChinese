@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - iAnctChinese</title>
-    <link rel="stylesheet" href="styles/login.css">
+    <link rel="stylesheet" href="../styles/login.css">
     <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
@@ -70,14 +70,14 @@
         </div>
     </div>
     
-    <script src="js/auth.js"></script>
+    <script src="../js/auth.js"></script>
     <script>
         // 初始化图标
         feather.replace();
         
         // 检查是否已登录
         if (localStorage.getItem('currentUser')) {
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         }
     </script>
 </body>

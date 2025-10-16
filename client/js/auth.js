@@ -23,7 +23,7 @@ class AuthManager {
     logout() {
         localStorage.removeItem('currentUser');
         this.currentUser = null;
-        window.location.href = 'login.html';
+        window.location.href = 'pages/login.html';
     }
     
     // 检查是否已登录
@@ -111,7 +111,7 @@ class AuthManager {
     // 要求登录（用于保护页面）
     requireLogin() {
         if (!this.isLoggedIn()) {
-            window.location.href = 'login.html';
+            window.location.href = 'pages/login.html';
             return false;
         }
         return true;
@@ -170,7 +170,7 @@ if (document.getElementById('login-form')) {
             }
             
             // 跳转到主页
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         } else {
             // 显示错误
             showError(result.error);
