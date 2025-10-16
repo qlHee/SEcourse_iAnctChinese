@@ -34,8 +34,18 @@ class UIManager {
             runSegBtn: document.getElementById('run-seg-btn'),
             copySegBtn: document.getElementById('copy-seg-btn'),
             segStatus: document.getElementById('seg-status'),
-            segList: document.getElementById('seg-list')
+            segList: document.getElementById('seg-list'),
+            saveStatus: document.getElementById('save-status'),
+            autoSaveToggle: document.getElementById('auto-save-toggle')
         };
+        
+        // 自动保存设置 - 彻底关闭
+        this.autoSaveEnabled = false;
+        this.autoSaveTimer = null;
+        
+        // 搜索状态
+        this.currentProjectSearch = '';
+        this.currentDocumentSearch = '';
         
         // Initialize
         this.initializeEventListeners();
@@ -45,8 +55,45 @@ class UIManager {
     initializeEventListeners() {
         // Header buttons
         document.getElementById('language-btn').addEventListener('click', () => this.toggleLanguageDropdown());
-        document.getElementById('save-document-btn').addEventListener('click', () => this.saveDocument());
-        document.getElementById('back-to-project-btn').addEventListener('click', () => this.backToProject());
+        document.getElementById('save-document-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.saveDocument();
+        });
+        document.getElementById('back-to-project-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.backToProject();
+        });
+        
+        // 侧边栏保存按钮
+        const sidebarSaveBtn = document.getElementById('save-document-sidebar-btn');
+        if (sidebarSaveBtn) {
+            sidebarSaveBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.saveDocument();
+            });
+        }
+        
+        // 搜索功能
+        const projectSearchInput = document.getElementById('project-search');
+        if (projectSearchInput) {
+            projectSearchInput.addEventListener('input', (e) => {
+                this.currentProjectSearch = e.target.value;
+                this.renderProjects();
+            });
+        }
+        
+        const documentSearchInput = document.getElementById('document-search');
+        if (documentSearchInput) {
+            documentSearchInput.addEventListener('input', (e) => {
+                this.currentDocumentSearch = e.target.value;
+                this.renderDocuments();
+            });
+        }
+        
+        // 自动保存已彻底关闭，移除切换功能
+        if (this.elements.autoSaveToggle) {
+            this.elements.autoSaveToggle.style.display = 'none';
+        }
         
         // Home content buttons
         document.getElementById('create-project-btn').addEventListener('click', () => this.showCreateProjectModal());
@@ -59,10 +106,12 @@ class UIManager {
         // Editor content
         document.getElementById('document-content').addEventListener('input', (e) => {
             dataManager.setEditingContent(e.target.value);
+            this.onContentChange();
         });
         
         document.getElementById('editor-author').addEventListener('input', (e) => {
             dataManager.setEditingAuthor(e.target.value);
+            this.onContentChange();
         });
         
         // Tab switching
@@ -104,8 +153,18 @@ class UIManager {
         });
         
         // Listen to data changes
-        dataManager.on('projectsChanged', () => this.renderProjects());
-        dataManager.on('documentsChanged', () => this.renderDocuments());
+        dataManager.on('projectsChanged', () => {
+            // 只在主页视图时渲染项目列表
+            if (this.currentView === 'home') {
+                this.renderProjects();
+            }
+        });
+        dataManager.on('documentsChanged', () => {
+            // 只在文档列表视图时渲染文档列表
+            if (this.currentView === 'documents') {
+                this.renderDocuments();
+            }
+        });
         dataManager.on('editingStateChanged', (data) => this.updateEditorState(data));
     }
     
@@ -114,6 +173,14 @@ class UIManager {
         this.currentView = 'home';
         this.currentProjectId = null;
         this.currentProjectName = '';
+        
+        // 清除搜索状态
+        this.currentProjectSearch = '';
+        this.currentDocumentSearch = '';
+        const projectSearchInput = document.getElementById('project-search');
+        if (projectSearchInput) projectSearchInput.value = '';
+        const documentSearchInput = document.getElementById('document-search');
+        if (documentSearchInput) documentSearchInput.value = '';
         
         this.elements.homeContent.style.display = 'block';
         this.elements.documentListContainer.style.display = 'none';
@@ -127,6 +194,11 @@ class UIManager {
         this.currentView = 'documents';
         this.currentProjectId = projectId;
         this.currentProjectName = projectName;
+        
+        // 清除文档搜索状态
+        this.currentDocumentSearch = '';
+        const documentSearchInput = document.getElementById('document-search');
+        if (documentSearchInput) documentSearchInput.value = '';
         
         this.elements.homeContent.style.display = 'none';
         this.elements.documentListContainer.style.display = 'block';
@@ -146,25 +218,46 @@ class UIManager {
         this.elements.editorButtons.style.display = 'flex';
         
         dataManager.setEditingDocId(docId);
+        
+        // 防止路由系统干扰编辑器
+        window.history.replaceState({ view: 'editor', docId }, '', window.location.href);
     }
     
     // Project rendering
     renderProjects() {
-        const projects = dataManager.projects;
+        // 只在主页视图时渲染
+        if (this.currentView !== 'home') return;
+        
+        // 使用搜索功能过滤项目
+        const projects = dataManager.searchProjects(this.currentProjectSearch);
         const projectList = this.elements.projectList;
         
         if (projects.length === 0) {
-            projectList.innerHTML = `
-                <div class="empty-state">
-                    <h3>欢迎使用 iAnctChinese-Client！</h3>
-                    <p>您还没有创建任何项目，点击右上角的"新建项目"按钮开始创建您的第一个项目吧！</p>
-                    <div style="margin-top: 20px;">
-                        <button class="create-btn" onclick="uiManager.showCreateProjectModal()">
-                            <i data-feather="plus"></i> 创建第一个项目
-                        </button>
+            if (this.currentProjectSearch) {
+                projectList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>未找到匹配的项目</h3>
+                        <p>没有找到包含 "${this.currentProjectSearch}" 的项目</p>
+                        <div style="margin-top: 20px;">
+                            <button class="action-btn" onclick="document.getElementById('project-search').value=''; uiManager.currentProjectSearch=''; uiManager.renderProjects();">
+                                <i data-feather="x"></i> 清除搜索
+                            </button>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                projectList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>欢迎使用 iAnctChinese-Client！</h3>
+                        <p>您还没有创建任何项目，点击右上角的"新建项目"按钮开始创建您的第一个项目吧！</p>
+                        <div style="margin-top: 20px;">
+                            <button class="create-btn" onclick="uiManager.showCreateProjectModal()">
+                                <i data-feather="plus"></i> 创建第一个项目
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
             // Re-initialize feather icons for the empty state
             feather.replace();
             return;
@@ -199,30 +292,46 @@ class UIManager {
     
     // Document rendering
     renderDocuments() {
-        if (!this.currentProjectId) return;
+        // 只在文档列表视图时渲染，避免在编辑器视图时干扰
+        if (!this.currentProjectId || this.currentView !== 'documents') return;
         
-        const documents = dataManager.getDocumentsByProject(this.currentProjectId);
+        // 使用搜索功能过滤文档
+        const documents = dataManager.searchDocuments(this.currentDocumentSearch, this.currentProjectId);
         const documentListContent = this.elements.documentListContent;
         
         if (documents.length === 0) {
-            documentListContent.innerHTML = `
-                <div class="empty-state">
-                    <h3>项目还没有文档</h3>
-                    <p>您可以通过以下方式添加文档：</p>
-                    <ul style="text-align: left; margin: 20px 0;">
-                        <li>点击"新建文档"创建空白文档</li>
-                        <li>点击"导入文档"上传本地文件</li>
-                    </ul>
-                    <div style="margin-top: 20px;">
-                        <button class="action-btn" onclick="uiManager.showCreateDocumentModal()">
-                            <i data-feather="plus"></i> 新建文档
-                        </button>
-                        <button class="action-btn" onclick="uiManager.showImportDocumentModal()">
-                            <i data-feather="upload"></i> 导入文档
-                        </button>
+            if (this.currentDocumentSearch) {
+                documentListContent.innerHTML = `
+                    <div class="empty-state">
+                        <h3>未找到匹配的文档</h3>
+                        <p>没有找到包含 "${this.currentDocumentSearch}" 的文档</p>
+                        <div style="margin-top: 20px;">
+                            <button class="action-btn" onclick="document.getElementById('document-search').value=''; uiManager.currentDocumentSearch=''; uiManager.renderDocuments();">
+                                <i data-feather="x"></i> 清除搜索
+                            </button>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                documentListContent.innerHTML = `
+                    <div class="empty-state">
+                        <h3>项目还没有文档</h3>
+                        <p>您可以通过以下方式添加文档：</p>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>点击"新建文档"创建空白文档</li>
+                            <li>点击"导入文档"上传本地文件</li>
+                        </ul>
+                        <div style="margin-top: 20px;">
+                            <button class="action-btn" onclick="uiManager.showCreateDocumentModal()">
+                                <i data-feather="plus"></i> 新建文档
+                            </button>
+                            <button class="action-btn" onclick="uiManager.showImportDocumentModal()">
+                                <i data-feather="upload"></i> 导入文档
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
             // Re-initialize feather icons for the empty state
             feather.replace();
             return;
@@ -293,6 +402,7 @@ class UIManager {
                 content.placeholder = '请输入实体标注内容...';
                 this.toggleAnalysisSection(false);
                 this.toggleEntitySection(true);
+                this.toggleSegSection(false);  // 关闭自动分词面板
                 break;
             case '古文解析':
                 content.placeholder = '请输入需要解析的古文内容...';
@@ -615,16 +725,75 @@ class UIManager {
         dataManager.setEditingDocId(docId);
     }
     
-    saveDocument() {
-        const savedDoc = dataManager.saveEditingDocument();
-        if (savedDoc) {
-            this.showToast('文档保存成功', 'success');
-            this.showDocumentListView(this.currentProjectId, this.currentProjectName);
+    async saveDocument() {
+        try {
+            // 确保当前在编辑器视图
+            if (this.currentView !== 'editor') {
+                console.warn('不在编辑器视图，跳过保存');
+                return;
+            }
+            
+            const savedDoc = await dataManager.saveEditingDocument();
+            if (savedDoc) {
+                this.showToast('文档保存成功', 'success');
+                this.showSaveStatus();
+                
+                // 强制确保留在编辑器页面
+                this.currentView = 'editor';
+                this.elements.homeContent.style.display = 'none';
+                this.elements.documentListContainer.style.display = 'none';
+                this.elements.documentEditor.style.display = 'block';
+                this.elements.editorButtons.style.display = 'flex';
+            } else {
+                this.showToast('保存失败', 'error');
+            }
+        } catch (error) {
+            console.error('保存文档错误:', error);
+            this.showToast('保存失败: ' + error.message, 'error');
         }
     }
     
-    backToProject() {
+    // 显示保存状态
+    showSaveStatus() {
+        if (this.elements.saveStatus) {
+            this.elements.saveStatus.style.display = 'block';
+            setTimeout(() => {
+                this.elements.saveStatus.style.display = 'none';
+            }, 2000);
+        }
+    }
+    
+    // 内容变化时的处理
+    onContentChange() {
+        // 隐藏保存状态
+        if (this.elements.saveStatus) {
+            this.elements.saveStatus.style.display = 'none';
+        }
+        
+        // 自动保存已彻底关闭，仅显示保存提示
+        // 用户需要手动点击保存按钮
+    }
+    
+    // 自动保存功能已彻底移除
+    
+    async backToProject() {
+        // 设置内部导航标志，避免触发弹窗
+        if (window.app) {
+            window.app.isNavigatingInternally = true;
+        }
+        
+        // 保存当前编辑的内容
+        if (dataManager.editingDocId) {
+            await dataManager.saveEditingDocument();
+        }
         this.showDocumentListView(this.currentProjectId, this.currentProjectName);
+        
+        // 重置内部导航标志
+        setTimeout(() => {
+            if (window.app) {
+                window.app.isNavigatingInternally = false;
+            }
+        }, 100);
     }
     
     // Import document modal

@@ -18,15 +18,17 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <div class="header-title">My Project</div>
+        <div class="header-title">汉语智能标注平台</div>
         <div class="header-nav">
             <!-- Editor buttons (hidden by default) -->
             <div id="editor-buttons" class="editor-buttons" style="display: none;">
-                <button class="header-button" id="save-document-btn">
-                    <i data-feather="save"></i> 保存文档
+                <button type="button" class="header-button" id="save-document-btn">
+                    <i data-feather="save"></i>
+                    <span>保存文档</span>
                 </button>
-                <button class="header-button" id="back-to-project-btn">
-                    <i data-feather="arrow-left"></i> 返回项目
+                <button type="button" class="header-button" id="back-to-project-btn">
+                    <i data-feather="arrow-left"></i>
+                    <span>返回项目</span>
                 </button>
             </div>
             
@@ -34,15 +36,12 @@
             <div class="lang-wrapper">
                 <button class="header-button" id="language-btn">简体中文</button>
                 <div class="lang-dropdown" id="language-dropdown" style="display: none;">
-                    <div class="lang-item" data-lang="English">English</div>
-                    <div class="lang-item" data-lang="한국인">한국인</div>
                     <div class="lang-item" data-lang="简体中文">简体中文</div>
-                    <div class="lang-item" data-lang="繁体中文">繁体中文</div>
                 </div>
             </div>
             
-            <button class="header-button">个人信息</button>
-            <button class="header-button logout-button">登出</button>
+            <button class="header-button" id="user-info-btn">个人信息</button>
+            <button class="header-button logout-button" id="logout-btn">登出</button>
         </div>
     </header>
 
@@ -52,9 +51,15 @@
         <div id="home-content" class="home-content">
             <div class="page-header">
                 <h2 class="page-title">项目管理</h2>
-                <button class="create-btn" id="create-project-btn">
-                    <i data-feather="plus"></i> 新建项目
-                </button>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" id="project-search" placeholder="搜索项目..." class="search-input">
+                        <i data-feather="search" class="search-icon"></i>
+                    </div>
+                    <button class="create-btn" id="create-project-btn">
+                        <i data-feather="plus"></i> 新建项目
+                    </button>
+                </div>
             </div>
             
             <div class="project-list" id="project-list">
@@ -67,6 +72,10 @@
             <div class="document-list-header">
                 <h2 class="document-list-title" id="document-list-title">项目文档列表</h2>
                 <div class="document-list-actions">
+                    <div class="search-box">
+                        <input type="text" id="document-search" placeholder="搜索文档..." class="search-input">
+                        <i data-feather="search" class="search-icon"></i>
+                    </div>
                     <button class="action-btn" id="create-document-btn">
                         <i data-feather="plus"></i> 新建文档
                     </button>
@@ -134,6 +143,17 @@
                         <div class="info-item">
                             <label>创建时间:</label>
                             <span id="editor-created-at">-</span>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <button type="button" class="action-btn primary" id="save-document-sidebar-btn" style="width: 100%;">
+                                <i data-feather="save"></i> 保存文档
+                            </button>
+                        </div>
+                        <div id="save-status" style="font-size: 11px; color: #10b981; margin-top: 6px; text-align: center; display: none;">
+                            ✓ 已保存
+                        </div>
+                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px; text-align: center;">
+                            快捷键: Ctrl/Cmd + S
                         </div>
                     </div>
                     <div class="sidebar-section" id="entity-annotator" style="display: none;">
@@ -228,6 +248,48 @@
         </div>
     </div>
 
+    <!-- User Profile Modal -->
+    <div id="profile-modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal-form" id="profile-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">个人信息</h3>
+                <button class="modal-close" id="profile-modal-close">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="profile-modal-body">
+                <div class="modal-field">
+                    <label for="profile-username">用户名</label>
+                    <input type="text" id="profile-username" readonly style="background: #f3f4f6; cursor: not-allowed;">
+                </div>
+                <div class="modal-field">
+                    <label for="profile-email">邮箱</label>
+                    <input type="email" id="profile-email" placeholder="请输入邮箱">
+                </div>
+                <div class="modal-field">
+                    <label for="profile-new-password">新密码（可选）</label>
+                    <input type="password" id="profile-new-password" placeholder="留空表示不修改密码">
+                </div>
+                <div class="modal-field">
+                    <label for="profile-confirm-password">确认新密码</label>
+                    <input type="password" id="profile-confirm-password" placeholder="再次输入新密码">
+                </div>
+                <div class="modal-field">
+                    <label>注册时间</label>
+                    <div id="profile-created-at" style="padding: 8px 0; color: #6b7280;">-</div>
+                </div>
+                <div class="modal-field">
+                    <label>最后登录</label>
+                    <div id="profile-last-login" style="padding: 8px 0; color: #6b7280;">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="profile-cancel">取消</button>
+                <button class="modal-btn primary" id="profile-save">保存修改</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="toast" style="display: none;">
         <div class="toast-content">
@@ -239,9 +301,20 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/data-manager.js"></script>
     <script src="js/ui-manager.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        // 登录保护
+        if (!authManager.requireLogin()) {
+            // 会自动跳转到登录页
+        } else {
+            // 显示当前用户信息
+            const user = authManager.getCurrentUser();
+            document.querySelector('.header-button:nth-last-child(2)').textContent = user.username;
+        }
+    </script>
 </body>
 </html>

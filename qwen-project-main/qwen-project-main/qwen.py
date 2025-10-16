@@ -6,15 +6,13 @@ from flask_cors import CORS
 import sys
 import io
 import re
-from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 app = Flask(__name__)
 CORS(app) 
 
-# model_path = r"/Users/tuxol/Documents/DataVault/#CST/SE02/qwen/"
-model_path = Path(__file__).parent
+model_path = r"D:\z\qwen"
 
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForCausalLM.from_pretrained(
@@ -73,5 +71,5 @@ def analyze_text():
         return jsonify({'error': f'生成回复时出错: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5007, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False)
 

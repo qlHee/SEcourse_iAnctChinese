@@ -3,12 +3,25 @@
 
 class App {
     constructor() {
+        this.isNavigating = false; // 添加导航标志
         this.initializeApp();
     }
     
     initializeApp() {
         // Initialize Feather icons
         feather.replace();
+        
+        // Setup logout button
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            if (confirm('确定要登出吗？')) {
+                authManager.logout();
+            }
+        });
+        
+        // Setup user info button
+        document.getElementById('user-info-btn')?.addEventListener('click', () => {
+            this.showUserProfile();
+        });
         
         // Setup global error handling
         window.addEventListener('error', (e) => {
@@ -25,12 +38,31 @@ class App {
         this.setupKeyboardShortcuts();
         
         // Setup beforeunload warning for unsaved changes
+        this.isNavigatingInternally = false;
+        this.isPageMinimized = false;
+        
         window.addEventListener('beforeunload', (e) => {
-            if (dataManager.editingDocId && dataManager.editingContent) {
+            // 只在真正离开网站时触发弹窗，不在内部导航或最小化时触发
+            if (dataManager.editingDocId && dataManager.editingContent && !this.isNavigatingInternally && !this.isPageMinimized) {
                 e.preventDefault();
                 e.returnValue = '您有未保存的更改，确定要离开吗？';
                 return e.returnValue;
             }
+        });
+        
+        // 监听页面最小化/恢复
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.isPageMinimized = true;
+            } else {
+                this.isPageMinimized = false;
+            }
+        });
+        
+        // 监听内部导航
+        window.addEventListener('popstate', () => {
+            this.isNavigatingInternally = true;
+            setTimeout(() => { this.isNavigatingInternally = false; }, 100);
         });
         
         // Initialize URL routing
@@ -90,6 +122,11 @@ class App {
     }
     
     handleRouteChange() {
+        // 如果当前在编辑器页面，不处理路由变化
+        if (uiManager.currentView === 'editor') {
+            return;
+        }
+        
         const url = new URL(window.location);
         const path = url.pathname;
         const searchParams = url.searchParams;
@@ -305,6 +342,99 @@ class App {
         uiManager.showToast('测试数据已添加', 'success');
         uiManager.renderProjects();
     }
+    
+    // 显示用户信息模态框
+    showUserProfile() {
+        const modal = document.getElementById('profile-modal-overlay');
+        const user = authManager.getCurrentUser();
+        
+        if (!user) {
+            this.showErrorToast('未找到用户信息');
+            return;
+        }
+        
+        // 填充用户信息
+        document.getElementById('profile-username').value = user.username || '';
+        document.getElementById('profile-email').value = user.email || '';
+        document.getElementById('profile-new-password').value = '';
+        document.getElementById('profile-confirm-password').value = '';
+        document.getElementById('profile-created-at').textContent = user.created_at || '-';
+        document.getElementById('profile-last-login').textContent = user.last_login || '从未登录';
+        
+        // 显示模态框
+        modal.style.display = 'flex';
+        feather.replace();
+        
+        // 保存按钮
+        const saveBtn = document.getElementById('profile-save');
+        const cancelBtn = document.getElementById('profile-cancel');
+        const closeBtn = document.getElementById('profile-modal-close');
+        
+        // 移除旧的事件监听器
+        const newSaveBtn = saveBtn.cloneNode(true);
+        saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+        
+        newSaveBtn.addEventListener('click', async () => {
+            const email = document.getElementById('profile-email').value.trim();
+            const newPassword = document.getElementById('profile-new-password').value;
+            const confirmPassword = document.getElementById('profile-confirm-password').value;
+            
+            // 验证邮箱
+            if (!email || !isValidEmail(email)) {
+                uiManager.showToast('请输入有效的邮箱地址', 'error');
+                return;
+            }
+            
+            // 如果要修改密码，验证密码
+            if (newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    uiManager.showToast('两次输入的密码不一致', 'error');
+                    return;
+                }
+                if (newPassword.length < 6) {
+                    uiManager.showToast('密码至少需要6个字符', 'error');
+                    return;
+                }
+            }
+            
+            // 更新用户信息
+            newSaveBtn.disabled = true;
+            const updates = { email };
+            if (newPassword) {
+                updates.password = newPassword;
+            }
+            
+            const result = await authManager.updateUserInfo(user.id, updates);
+            
+            if (result.success) {
+                uiManager.showToast('个人信息更新成功', 'success');
+                modal.style.display = 'none';
+                
+                // 如果修改了密码，提示重新登录
+                if (newPassword) {
+                    setTimeout(() => {
+                        if (confirm('密码已修改，需要重新登录。现在跳转到登录页面吗？')) {
+                            authManager.logout();
+                        }
+                    }, 1000);
+                }
+            } else {
+                uiManager.showToast(result.error || '更新失败', 'error');
+            }
+            
+            newSaveBtn.disabled = false;
+        });
+        
+        // 取消按钮
+        cancelBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+        
+        // 关闭按钮
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+    }
 }
 
 // Initialize application when DOM is loaded
@@ -328,11 +458,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Handle page visibility changes
-document.addEventListener('visibilitychange', () => {
+document.addEventListener('visibilitychange', async () => {
     if (document.hidden) {
         // Page is hidden, save any pending changes
         if (dataManager.editingDocId) {
-            dataManager.saveEditingDocument();
+            await dataManager.saveEditingDocument();
         }
     }
 });

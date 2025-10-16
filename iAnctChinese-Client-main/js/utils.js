@@ -38,6 +38,15 @@ function getCurrentDate() {
 }
 
 /**
+ * Get current timestamp in YYYY-MM-DD format (date only)
+ * @returns {string} Current timestamp string
+ */
+function getCurrentTimestamp() {
+    const now = new Date();
+    return now.toISOString().slice(0, 10);
+}
+
+/**
  * Debounce function to limit function calls
  * @param {Function} func - Function to debounce
  * @param {number} wait - Wait time in milliseconds
