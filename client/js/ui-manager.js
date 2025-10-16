@@ -36,7 +36,11 @@ class UIManager {
             segStatus: document.getElementById('seg-status'),
             segList: document.getElementById('seg-list'),
             saveStatus: document.getElementById('save-status'),
-            autoSaveToggle: document.getElementById('auto-save-toggle')
+            autoSaveToggle: document.getElementById('auto-save-toggle'),
+            qaInput: document.getElementById('qa-input'),
+            qaSubmitBtn: document.getElementById('qa-submit-btn'),
+            qaStatus: document.getElementById('qa-status'),
+            qaHistory: document.getElementById('qa-history')
         };
         
         // 自动保存设置 - 彻底关闭
@@ -125,6 +129,16 @@ class UIManager {
         }
         if (this.elements.runAnalysisBtn) {
             this.elements.runAnalysisBtn.addEventListener('click', () => this.runClassicalAnalysis());
+        }
+
+        // Q&A actions
+        if (this.elements.qaSubmitBtn) {
+            this.elements.qaSubmitBtn.addEventListener('click', () => this.submitQuestion());
+        }
+        if (this.elements.qaInput) {
+            this.elements.qaInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.submitQuestion();
+            });
         }
 
         // Entity annotation actions
@@ -545,25 +559,10 @@ class UIManager {
                             <strong>DeepSeek-V3</strong> <span style="color:#10b981;font-size:12px;">(推荐)</span>
                             <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">最新V3模型，速度快，效果好</div>
                         </label>
-                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                        <label style="display:block;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
                             <input type="radio" name="model" value="deepseek-reasoner" style="margin-right:8px;">
                             <strong>DeepSeek-R1</strong>
                             <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">推理模型，深度分析，速度较慢</div>
-                        </label>
-                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
-                            <input type="radio" name="model" value="qwen-max" style="margin-right:8px;">
-                            <strong>Qwen-Max</strong>
-                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">通义千问最强模型</div>
-                        </label>
-                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
-                            <input type="radio" name="model" value="qwen-plus" style="margin-right:8px;">
-                            <strong>Qwen-Plus</strong>
-                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">性价比高，效果优秀</div>
-                        </label>
-                        <label style="display:block;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
-                            <input type="radio" name="model" value="qwen-turbo" style="margin-right:8px;">
-                            <strong>Qwen-Turbo</strong>
-                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">响应速度快</div>
                         </label>
                     </div>
                     <div style="display:flex;gap:12px;justify-content:flex-end;">
@@ -590,6 +589,84 @@ class UIManager {
                 }
             };
         });
+    }
+
+    async submitQuestion() {
+        const question = this.elements.qaInput?.value?.trim() || '';
+        if (!question) {
+            this.showToast('请输入您的疑问', 'warning');
+            return;
+        }
+
+        const text = this.elements.documentContent?.value?.trim() || '';
+        if (!text) {
+            this.showToast('请先输入古文内容', 'warning');
+            return;
+        }
+
+        // 显示模型选择框
+        const model = await this.showModelSelectDialog();
+        if (!model) return; // 用户取消
+
+        if (this.elements.qaStatus) this.elements.qaStatus.style.display = 'block';
+
+        try {
+            const result = await this.callQAAPI(text, question, model);
+            this.addQuestionToHistory(question, result);
+            this.elements.qaInput.value = ''; // 清空输入框
+            this.showToast('答疑完成', 'success');
+        } catch (err) {
+            console.error(err);
+            this.showToast(`答疑失败：${err.message || err}`, 'error');
+        } finally {
+            if (this.elements.qaStatus) this.elements.qaStatus.style.display = 'none';
+        }
+    }
+
+    async callQAAPI(text, question, model) {
+        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5007') + '/api/qa';
+        const resp = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, question, model })
+        });
+        if (!resp.ok) {
+            let detail = '';
+            try { detail = (await resp.json()).error || ''; } catch {}
+            throw new Error(detail || `HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        return data.result || '';
+    }
+
+    addQuestionToHistory(question, answer) {
+        if (!this.elements.qaHistory) return;
+
+        // 如果是首次提问，清空占位符
+        const placeholder = this.elements.qaHistory.querySelector('div[style*="color:#9ca3af"]');
+        if (placeholder) {
+            this.elements.qaHistory.innerHTML = '';
+        }
+
+        const qaItem = document.createElement('div');
+        qaItem.style.cssText = 'margin-bottom:12px;padding:8px;background:#fff;border-radius:6px;border:1px solid #e5e7eb;';
+        qaItem.innerHTML = `
+            <div style="font-size:13px;color:#3b82f6;font-weight:bold;margin-bottom:4px;">
+                <i data-feather="message-circle" style="width:14px;height:14px;"></i> 问：${this.escapeHTML(question)}
+            </div>
+            <div style="font-size:13px;color:#374151;line-height:1.5;white-space:pre-wrap;">${this.escapeHTML(answer)}</div>
+        `;
+        this.elements.qaHistory.appendChild(qaItem);
+        feather.replace();
+
+        // 滚动到底部
+        this.elements.qaHistory.scrollTop = this.elements.qaHistory.scrollHeight;
+    }
+
+    escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 
     toggleEntitySection(show) {
