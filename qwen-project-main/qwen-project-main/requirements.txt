@@ -1,8 +1,4 @@
-torch>=1.10.0,<3.0.0
-transformers>=4.25.0,<5.0.0
+# 古文解析服务依赖 (基于大模型API)
 flask>=2.0.0,<3.0.0
 flask-cors>=3.0.10
-protobuf>=3.20.0,<5.0.0
-numpy>=1.21.0
-accelerate>=0.20.0
-safetensors>=0.3.0
+requests>=2.28.0

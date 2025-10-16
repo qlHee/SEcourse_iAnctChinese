@@ -1,0 +1,44 @@
+{
+  "_comment": "这是配置文件示例，复制为 config.json 并填写实际值",
+  "api_type": "openai",
+  "api_key": "YOUR_API_KEY_HERE",
+  "api_base_url": "https://api.openai.com/v1",
+  "model_name": "gpt-3.5-turbo",
+  "temperature": 0.7,
+  "max_tokens": 1000,
+  "timeout": 60,
+  
+  "_examples": {
+    "openai": {
+      "api_type": "openai",
+      "api_key": "sk-proj-xxxxxxxxxxxxx",
+      "api_base_url": "https://api.openai.com/v1",
+      "model_name": "gpt-3.5-turbo"
+    },
+    "qwen": {
+      "api_type": "qwen",
+      "api_key": "sk-xxxxxxxxxxxxx",
+      "api_base_url": "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation",
+      "model_name": "qwen-turbo"
+    },
+    "wenxin": {
+      "api_type": "wenxin",
+      "api_key": "xxxxxxxxxxxxx",
+      "secret_key": "xxxxxxxxxxxxx",
+      "model_name": "ERNIE-Bot-turbo"
+    },
+    "chatglm": {
+      "api_type": "chatglm",
+      "api_key": "xxxxxxxxxxxxx.xxxxxxxxxxxxx",
+      "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+      "model_name": "glm-4"
+    },
+    "claude": {
+      "api_type": "claude",
+      "api_key": "sk-ant-xxxxxxxxxxxxx",
+      "api_base_url": "https://api.anthropic.com/v1/messages",
+      "model_name": "claude-3-sonnet-20240229"
+    }
+  }
+}
+
