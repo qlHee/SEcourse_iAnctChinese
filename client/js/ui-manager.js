@@ -510,11 +510,16 @@ class UIManager {
             this.showToast('请输入需要解析的古文内容', 'warning');
             return;
         }
+        
+        // 显示模型选择框
+        const model = await this.showModelSelectDialog();
+        if (!model) return; // 用户取消
+        
         if (this.elements.analysisStatus) this.elements.analysisStatus.style.display = 'block';
         if (this.elements.analysisResult) this.elements.analysisResult.textContent = '——';
 
         try {
-            const result = await this.callAnalyzeAPI(text);
+            const result = await this.callAnalyzeAPI(text, model);
             if (this.elements.analysisResult) {
                 this.elements.analysisResult.innerHTML = this.formatResultHTML(result);
             }
@@ -525,6 +530,51 @@ class UIManager {
         } finally {
             if (this.elements.analysisStatus) this.elements.analysisStatus.style.display = 'none';
         }
+    }
+    
+    showModelSelectDialog() {
+        return new Promise((resolve) => {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
+            dialog.innerHTML = `
+                <div style="background:white;border-radius:12px;padding:24px;min-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+                    <h3 style="margin:0 0 16px 0;color:#1f2937;font-size:18px;">选择解析模型</h3>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                            <input type="radio" name="model" value="deepseek-chat" checked style="margin-right:8px;">
+                            <strong>DeepSeek-V3</strong> <span style="color:#10b981;font-size:12px;">(推荐)</span>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">最新V3模型，速度快，效果好</div>
+                        </label>
+                        <label style="display:block;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
+                            <input type="radio" name="model" value="deepseek-reasoner" style="margin-right:8px;">
+                            <strong>DeepSeek-R1</strong>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">推理模型，深度分析，速度较慢</div>
+                        </label>
+                    </div>
+                    <div style="display:flex;gap:12px;justify-content:flex-end;">
+                        <button id="model-cancel" style="padding:8px 20px;border:1px solid #d1d5db;background:white;border-radius:6px;cursor:pointer;font-size:14px;">取消</button>
+                        <button id="model-confirm" style="padding:8px 20px;border:none;background:#3b82f6;color:white;border-radius:6px;cursor:pointer;font-size:14px;">确定</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(dialog);
+            
+            dialog.querySelector('#model-confirm').onclick = () => {
+                const selected = dialog.querySelector('input[name="model"]:checked');
+                document.body.removeChild(dialog);
+                resolve(selected ? selected.value : null);
+            };
+            dialog.querySelector('#model-cancel').onclick = () => {
+                document.body.removeChild(dialog);
+                resolve(null);
+            };
+            dialog.onclick = (e) => {
+                if (e.target === dialog) {
+                    document.body.removeChild(dialog);
+                    resolve(null);
+                }
+            };
+        });
     }
 
     toggleEntitySection(show) {
@@ -583,12 +633,12 @@ class UIManager {
         }).join('');
         feather.replace();
     }
-    async callAnalyzeAPI(text) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5000') + '/api/analyze';
+    async callAnalyzeAPI(text, model) {
+        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5007') + '/api/analyze';
         const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text, model })
         });
         if (!resp.ok) {
             let detail = '';
