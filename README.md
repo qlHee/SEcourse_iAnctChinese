@@ -1,371 +1,310 @@
-# iAnctChinese 古汉语智能标注平台
+# iAnctChinese-Client 项目 - API版本
 
-## 📢 重要更新
+## 项目概述
 
-✨ **AI功能已升级！** 从本地模型部署改为调用大模型API，无需GPU，使用更便捷。
+这是一个古汉语文档管理和分析系统，包含以下核心功能：
 
----
+1. **文档管理系统** (`iAnctChinese-Client-main/`)
+   - 项目和文档管理
+   - 文档编辑器
+   - 实体标注
+   - 古文解析（AI功能）
+   - 自动分词
 
-## 🎯 项目简介
+2. **古文解析服务** (`qwen-project-main/`)
+   - AI古文解析后端服务
+   - **已更新为 API 调用方式**
 
-这是一个功能完整的**古汉语智能标注和分析平台**，包含：
+## 重要更新
 
-### 核心功能
-- ✅ 用户系统（注册/登录/数据隔离）
-- ✅ 项目管理（创建/编辑/删除）
-- ✅ 文档管理（创建/编辑/删除/导入）
-- ✅ 实体标注（人物、地名、时间、器物等）
-- ✅ 自动分词（基于jieba）
-- ✅ **古文智能解析（基于大模型API）** 🆕
-- ✅ 云端数据同步
+### ✨ AI功能改造
 
-### 技术架构
-- **前端**: HTML5 + CSS3 + JavaScript (ES6+)
-- **后端**: Node.js (Express) + Python (Flask)
-- **AI**: 支持OpenAI、通义千问、文心一言等多种大模型API
+原项目使用本地部署的 Qwen3-0.6B 模型，现已改为调用大模型 API：
 
----
+- ✅ 支持**阿里通义千问 (Qwen)** API
+- ✅ 支持 **DeepSeek** API
+- ✅ 无需 GPU，普通电脑即可运行
+- ✅ 启动速度快，响应效率高
+- ✅ 使用更强大的模型，解析质量更高
 
-## 🚀 快速开始
+### 📝 改动说明
 
-### 前置要求
-- Node.js 14+
-- Python 3.8+
-- 网络连接
+1. **修改的文件**：
+   - `qwen-project-main/qwen.py` - 改为 API 调用方式
+   - `qwen-project-main/requirements.txt` - 精简依赖
+   - `qwen-project-main/项目说明文档.md` - 更新说明
+   
+2. **新增的文件**：
+   - `qwen-project-main/config.example.json` - API 配置示例
+   - `qwen-project-main/API配置指南.md` - 详细配置说明
+   - `qwen-project-main/test_api.py` - API 测试脚本
 
-### 1️⃣ 启动必需服务
+3. **未修改的功能**：
+   - ✅ 前端界面完全不变
+   - ✅ 文档管理功能不变
+   - ✅ 分词功能不变（仍使用 jieba）
+   - ✅ API 接口定义不变
+   - ✅ 解析结果格式不变
 
-```bash
-# 用户管理服务（端口5002）
-cd "iAnctChinese-Client-main/server"
-npm install && npm start
+## 快速开始
 
-# 分词服务（端口5001）
-cd "../"
-pip install flask flask-cors jieba
-python seg_server.py
-
-# 打开前端页面
-# 双击 iAnctChinese-Client-main/index.html
-# 或运行：python -m http.server 8000
-```
-
-### 2️⃣ 启动AI服务（可选）
+### 第一步：安装依赖
 
 ```bash
-# 进入AI服务目录
-cd "qwen-project-main/qwen-project-main"
-
-# 安装依赖
+# 古文解析服务依赖
+cd qwen-project-main/qwen-project-main
 pip install -r requirements.txt
 
-# ⚠️ 重要：配置API密钥
-# 编辑 qwen.py，在顶部配置区域填写：
-#   API_TYPE = "openai"  # 或其他API类型
-#   API_KEY = "your_api_key_here"  # ⚠️ 填写您的API密钥
+# 分词服务依赖
+cd ../../iAnctChinese-Client-main
+pip install flask flask-cors jieba
+```
 
-# 测试配置（推荐）
-python test_api.py
+### 第二步：配置 API Key ⚠️ **重要**
 
-# 启动服务（端口5000）
+**这是必须的步骤！**
+
+1. 进入 qwen 项目目录：
+   ```bash
+   cd qwen-project-main/qwen-project-main
+   ```
+
+2. 复制配置文件：
+   ```bash
+   cp config.example.json config.json
+   ```
+
+3. 获取 API Key（二选一）：
+
+   **选项A - 阿里通义千问（推荐）**：
+   - 访问 https://dashscope.console.aliyun.com/
+   - 注册并开通 DashScope 服务
+   - 创建 API Key
+
+   **选项B - DeepSeek**：
+   - 访问 https://platform.deepseek.com/
+   - 注册账号并创建 API Key
+
+4. 编辑 `config.json`，填入您的 API Key：
+
+   ```json
+   {
+     "api_provider": "qwen",
+     "api_config": {
+       "qwen": {
+         "api_key": "【在这里填入您的通义千问 API Key】",
+         "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+         "model": "qwen-turbo"
+       },
+       "deepseek": {
+         "api_key": "【在这里填入您的 DeepSeek API Key】",
+         "base_url": "https://api.deepseek.com",
+         "model": "deepseek-chat"
+       }
+     }
+   }
+   ```
+
+   **重要提示**：
+   - 如果使用通义千问，在 `"qwen"` -> `"api_key"` 处填入
+   - 如果使用 DeepSeek，在 `"deepseek"` -> `"api_key"` 处填入
+   - 通过修改 `"api_provider"` 字段选择使用哪个 API
+
+### 第三步：启动服务
+
+需要启动两个后端服务：
+
+**终端 1 - 古文解析服务（端口 5000）**：
+```bash
+cd qwen-project-main/qwen-project-main
 python qwen.py
 ```
 
-**详细配置教程**: [API配置示例.md](qwen-project-main/qwen-project-main/API配置示例.md)
-
----
-
-## 📚 文档导航
-
-### 必读文档
-- **[快速启动指南.md](快速启动指南.md)** - 5分钟快速上手
-- **[项目修改说明.md](项目修改说明.md)** - 了解本次修改内容
-
-### AI服务配置（使用古文解析功能必读）
-- **[API配置示例.md](qwen-project-main/qwen-project-main/API配置示例.md)** - 详细的API配置教程
-- **[更新说明.md](qwen-project-main/qwen-project-main/更新说明.md)** - AI服务的更新说明
-- **[项目说明文档.md](qwen-project-main/qwen-project-main/项目说明文档.md)** - 完整的使用指南
-
-### 其他文档
-- **[云端同步使用指南.md](iAnctChinese-Client-main/云端同步使用指南.md)** - 数据同步说明
-- **[用户数据隔离说明.md](iAnctChinese-Client-main/用户数据隔离说明.md)** - 数据安全说明
-
----
-
-## 🔑 API密钥配置（重要）
-
-### 获取API密钥
-
-#### 推荐方案1：阿里云通义千问（国内用户）
-
-1. 访问 https://dashscope.aliyun.com/
-2. 注册并登录
-3. 开通通义千问服务
-4. 获取API Key
-
-**配置代码** (在 `qwen.py` 中)：
-```python
-API_TYPE = "qwen"
-API_KEY = "sk-xxxxxxxxxxxxx"  # ⚠️ 填写您的API Key
-MODEL_NAME = "qwen-turbo"
+看到以下输出表示成功：
+```
+============================================================
+古文解析 API 服务启动中...
+API 提供商: qwen
+使用模型: qwen-turbo
+服务地址: http://0.0.0.0:5000
+============================================================
 ```
 
-#### 推荐方案2：OpenAI API（国际用户）
-
-1. 访问 https://platform.openai.com/
-2. 注册并获取API Key
-
-**配置代码**：
-```python
-API_TYPE = "openai"
-API_KEY = "sk-proj-xxxxxxxxxxxxx"  # ⚠️ 填写您的API Key
-MODEL_NAME = "gpt-3.5-turbo"
+**终端 2 - 分词服务（端口 5001）**：
+```bash
+cd iAnctChinese-Client-main
+python seg_server.py
 ```
 
-#### 其他选择
-- **百度文心一言**: https://cloud.baidu.com/product/wenxinworkshop
-- **智谱AI**: https://open.bigmodel.cn/
-- **Claude**: https://www.anthropic.com/
+### 第四步：打开前端页面
 
-**完整配置教程**: [API配置示例.md](qwen-project-main/qwen-project-main/API配置示例.md)
+用浏览器打开：
+```
+iAnctChinese-Client-main/index.html
+```
 
----
+或使用本地服务器（推荐）：
+```bash
+cd iAnctChinese-Client-main
+python -m http.server 8000
+# 然后访问 http://localhost:8000
+```
 
-## 🧪 测试配置
+## 功能验证
 
-配置完API密钥后，运行测试脚本验证：
+### 测试 API 服务
 
+运行测试脚本：
 ```bash
 cd qwen-project-main/qwen-project-main
 python test_api.py
 ```
 
-如果看到 `✅ API调用成功！` 说明配置正确。
-
----
-
-## 📊 服务端口
-
-| 服务 | 端口 | 必需 | 说明 |
-|------|------|------|------|
-| 前端页面 | 8000 | 可选 | 也可直接打开HTML |
-| AI解析 | 5000 | 可选 | 需配置API Key |
-| 分词服务 | 5001 | ✅ | jieba分词 |
-| 用户服务 | 5002 | ✅ | 用户和数据管理 |
-
----
-
-## 💡 功能说明
-
-### 基础功能（无需AI服务）
-启动用户服务(5002)和分词服务(5001)后即可使用：
-
-- ✅ 用户注册/登录
-- ✅ 项目管理
-- ✅ 文档管理
-- ✅ 实体标注
-- ✅ 自动分词
-- ✅ 数据云端同步
-
-### AI功能（需启动AI服务）
-额外启动AI服务(5000)后可使用：
-
-- ✅ 古文智能解析
-  - 字面意思解读
-  - 哲学思想分析
-  - 现实意义阐释
-
----
-
-## 🆕 本次修改内容
-
-### 核心改动
-将AI功能从**本地模型部署**改为**调用大模型API**
-
-### 优势对比
-
-| 特性 | 旧版本（本地） | 新版本（API） |
-|------|-------------|--------------|
-| GPU需求 | 需要RTX 4060+ | ❌ 无需 |
-| 模型下载 | 1-2GB | ❌ 无需 |
-| 启动时间 | 1-3分钟 | ✅ 1秒 |
-| 响应速度 | 几分钟 | ✅ 3-10秒 |
-| 硬件成本 | ¥3000+ | ✅ ¥0 |
-| 使用成本 | 电费 | 按次计费 |
-| 模型效果 | Qwen3-0.6B | ✅ GPT级别 |
-
-### 修改的文件
-- `qwen.py` - 改为API调用方式
-- `requirements.txt` - 简化依赖
-- 相关文档更新
-
-### 未修改的部分
-- ✅ 前端代码（完全不变）
-- ✅ 用户服务
-- ✅ 分词服务
-- ✅ 其他所有功能
-
-**详细说明**: [项目修改说明.md](项目修改说明.md)
-
----
-
-## 💰 使用成本
-
-### API调用费用（参考）
-
-| API提供商 | 费用 | 每次解析成本 |
-|----------|------|------------|
-| OpenAI GPT-3.5 | $0.002/1K tokens | 约¥0.01-0.03 |
-| 通义千问 Turbo | ¥0.008/1K tokens | 约¥0.01 |
-| 文心一言 | 有免费额度 | 新用户免费 |
-| 智谱AI | 有免费额度 | 新用户免费 |
-
-**月度成本估算**（每天使用10次）：
-- GPT-3.5: 约¥3-10/月
-- 通义千问: 约¥3/月
-- 文心一言/智谱AI: 免费额度内可能¥0
-
----
-
-## 🛠️ 故障排除
-
-### 问题1：API调用失败
-
-**症状**: 点击"解析当前内容"无响应或报错
-
-**解决方案**:
-1. 检查API密钥是否正确配置
-2. 运行 `python test_api.py` 测试
-3. 检查网络连接
-4. 查看API账户余额
-
-### 问题2：端口被占用
-
-**症状**: 启动服务时报错 `EADDRINUSE`
-
-**解决方案**:
+或手动测试：
 ```bash
-# Mac/Linux
-lsof -i :5002  # 查看占用进程
-kill -9 <PID>  # 终止进程
+# 健康检查
+curl http://localhost:5000/health
 
-# Windows
-netstat -ano | findstr :5002
-taskkill /PID <PID> /F
+# 测试古文解析
+curl -X POST http://localhost:5000/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"text": "学而时习之，不亦说乎"}'
 ```
 
-### 问题3：依赖安装失败
+### 测试前端功能
 
-**解决方案**:
+1. 登录系统（或注册新用户）
+2. 创建项目
+3. 创建文档
+4. 在"古文解析"标签页输入古文
+5. 点击"解析"按钮
+6. 查看解析结果
+
+## 项目结构
+
+```
+iAnctChinese-Client-main 3_B/
+├── iAnctChinese-Client-main/     # 前端和文档管理系统
+│   ├── index.html                # 主页面
+│   ├── login.html                # 登录页面
+│   ├── js/                       # JavaScript 文件
+│   │   ├── app.js               # 主应用逻辑
+│   │   ├── ui-manager.js        # UI 管理（包含 AI 调用）
+│   │   ├── data-manager.js      # 数据管理
+│   │   └── ...
+│   ├── styles/                   # CSS 样式
+│   ├── seg_server.py            # 分词服务（未修改）
+│   └── server/                   # 用户服务器（未修改）
+│
+└── qwen-project-main/            # AI 古文解析服务
+    └── qwen-project-main/
+        ├── qwen.py               # 【已修改】API 调用实现
+        ├── requirements.txt      # 【已修改】精简依赖
+        ├── config.example.json   # 【新增】配置示例
+        ├── config.json           # 【需创建】实际配置
+        ├── API配置指南.md       # 【新增】配置说明
+        ├── test_api.py          # 【新增】测试脚本
+        ├── 项目说明文档.md      # 【已更新】
+        └── web/                  # 独立测试页面（未修改）
+```
+
+## API Key 配置位置标注
+
+需要填入 API Key 的位置：
+
+### 文件：`qwen-project-main/qwen-project-main/config.json`
+
+```json
+{
+  "api_provider": "qwen",  // 或 "deepseek"
+  "api_config": {
+    "qwen": {
+      "api_key": "👉 在这里填入阿里通义千问的 API Key 👈",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-turbo"
+    },
+    "deepseek": {
+      "api_key": "👉 在这里填入 DeepSeek 的 API Key 👈",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-chat"
+    }
+  }
+}
+```
+
+**如何获取 API Key**：
+
+1. **阿里通义千问**：https://dashscope.console.aliyun.com/
+2. **DeepSeek**：https://platform.deepseek.com/
+
+## 常见问题
+
+### Q1: 启动时提示"配置文件不存在"
+
 ```bash
-# npm安装失败 - 使用国内镜像
-npm config set registry https://registry.npmmirror.com
-npm install
-
-# pip安装失败 - 使用国内镜像
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+cd qwen-project-main/qwen-project-main
+cp config.example.json config.json
+# 然后编辑 config.json 填入 API Key
 ```
 
-**更多问题**: 查看 [快速启动指南.md](快速启动指南.md) 的故障排除章节
+### Q2: API 调用失败
 
----
+检查项：
+- ✓ API Key 是否正确填写
+- ✓ 网络连接是否正常
+- ✓ 账户余额是否充足
+- ✓ 选择的 `api_provider` 与填写的 API Key 是否对应
 
-## 🔒 安全提示
+### Q3: 前端无法连接后端
 
-⚠️ **API密钥安全**:
-- ❌ 不要将API密钥上传到公开仓库
-- ❌ 不要分享您的API密钥
-- ✅ 建议使用环境变量存储
-- ✅ 添加包含密钥的文件到 `.gitignore`
+确认：
+- ✓ 两个后端服务都已启动
+- ✓ 端口 5000 和 5001 没有被占用
+- ✓ 浏览器控制台没有跨域错误
 
----
+### Q4: 需要切换 API 提供商
 
-## 🎯 项目结构
+编辑 `config.json`，修改 `api_provider` 字段：
+- 使用通义千问：`"api_provider": "qwen"`
+- 使用 DeepSeek：`"api_provider": "deepseek"`
 
-```
-├── iAnctChinese-Client-main/        # 主应用
-│   ├── index.html                   # 前端页面
-│   ├── js/                          # 前端脚本
-│   ├── styles/                      # 样式文件
-│   ├── server/                      # 用户管理服务(5002)
-│   │   └── user-server.js
-│   ├── seg_server.py                # 分词服务(5001)
-│   └── data/                        # 数据存储
-│
-├── qwen-project-main/               # AI服务
-│   └── qwen-project-main/
-│       ├── qwen.py                  # AI服务(5000) ⚠️ 需配置API Key
-│       ├── test_api.py              # 配置测试脚本
-│       ├── requirements.txt         # 依赖
-│       ├── API配置示例.md           # 配置教程 ⭐
-│       └── 项目说明文档.md
-│
-├── 快速启动指南.md                  # ⭐ 必读
-├── 项目修改说明.md                  # 修改详情
-└── README.md                        # 本文件
-```
+## 费用说明
 
----
+⚠️ **调用大模型 API 会产生费用**
 
-## 🌟 使用示例
+- **阿里通义千问**：查看定价 https://help.aliyun.com/zh/dashscope/developer-reference/tongyi-qianwen-metering-and-billing
+- **DeepSeek**：查看定价 https://platform.deepseek.com/api-docs/pricing/
 
-1. **注册/登录**
-2. **创建项目**: "古文研究"
-3. **创建文档**: 输入 "学而时习之，不亦说乎"
-4. **实体标注**: 选中文字，标注为"概念"
-5. **自动分词**: 切换到"自动分词"，点击分词按钮
-6. **AI解析**: 切换到"古文解析"，点击解析按钮 ⭐
+建议：
+1. 在测试阶段控制调用次数
+2. 设置费用预警和上限
+3. 定期检查账户余额
 
----
+## 与原版本对比
 
-## 📞 获取帮助
+| 特性 | 原版本（本地模型） | 新版本（API调用） |
+|------|------------------|------------------|
+| 硬件要求 | 需要 GPU (≥2GB) | 无特殊要求 |
+| 模型下载 | 需要（几GB） | 不需要 |
+| 启动速度 | 慢（加载模型） | 快（即开即用） |
+| 模型性能 | 0.6B 参数 | 更强大的模型 |
+| 使用成本 | 硬件成本 | API 费用 |
+| 网络要求 | 不需要 | 需要 |
+| 维护难度 | 较高 | 简单 |
 
-- **配置问题**: 查看 [API配置示例.md](qwen-project-main/qwen-project-main/API配置示例.md)
-- **启动问题**: 查看 [快速启动指南.md](快速启动指南.md)
-- **功能问题**: 查看各服务的README文档
+## 文档索引
 
----
+- 📖 [API配置指南.md](qwen-project-main/qwen-project-main/API配置指南.md) - 详细的配置说明
+- 📖 [项目说明文档.md](qwen-project-main/qwen-project-main/项目说明文档.md) - 项目使用说明
+- 📖 [iAnctChinese README](iAnctChinese-Client-main/README.md) - 文档管理系统说明
 
-## 📝 更新日志
+## 技术支持
 
-### v2.0 (2025-10-16) - 当前版本
-- ✨ AI功能改为大模型API调用
-- ✅ 支持5种主流大模型API
-- ✅ 无需GPU和本地模型
-- ✅ 启动和响应速度显著提升
-- ✅ 前端和其他功能保持不变
+- 阿里云 DashScope 文档：https://help.aliyun.com/zh/dashscope/
+- DeepSeek API 文档：https://platform.deepseek.com/api-docs/
+- 项目问题：请查看各文档的"故障排查"部分
 
-### v1.0
-- ✅ 基于Qwen3-0.6B本地部署
-- ✅ 完整的项目和文档管理
-- ✅ 实体标注和自动分词
-
----
-
-## 📄 许可证
+## 许可证
 
 与原项目保持一致的许可证。
-
----
-
-## 🎉 开始使用
-
-```bash
-# 1. 克隆或下载项目
-# 2. 阅读快速启动指南
-open 快速启动指南.md
-
-# 3. 配置API密钥（如需AI功能）
-# 编辑 qwen-project-main/qwen-project-main/qwen.py
-
-# 4. 启动服务并访问
-```
-
-**祝您使用愉快！** 🚀
-
----
-
-**项目地址**: `/Users/tuxol/Documents/DataVault/#CST/SE02/iAnctChinese-Client-main 3_A`  
-**更新日期**: 2025-10-16  
-**版本**: v2.0
 

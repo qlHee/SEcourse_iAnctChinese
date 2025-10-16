@@ -1,34 +1,27 @@
-# API配置文件（包含密钥，不要上传）
+# API 配置文件（包含敏感的 API Key）
 config.json
-.env
-*.env
 
-# Python缓存
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-
-# 虚拟环境
-venv/
+.Python
 env/
+venv/
 ENV/
 
-# IDE配置
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.DS_Store
 
-# 日志文件
+# 日志
 *.log
 
-# 测试输出
-.pytest_cache/
-.coverage
-
-# 操作系统文件
-.DS_Store
-Thumbs.db
+# 环境变量
+.env
 

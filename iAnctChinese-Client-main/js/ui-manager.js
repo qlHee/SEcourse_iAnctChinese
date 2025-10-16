@@ -584,7 +584,7 @@ class UIManager {
         feather.replace();
     }
     async callAnalyzeAPI(text) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5000') + '/api/analyze';
+        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5007') + '/api/analyze';
         const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
