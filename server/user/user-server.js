@@ -505,6 +505,89 @@ app.delete('/api/documents/:documentId', async (req, res) => {
     }
 });
 
+// ============ 导出管理 API ============
+
+// 导出选中的文档与标注
+app.post('/api/export-documents', async (req, res) => {
+    try {
+        const { documentIds } = req.body;
+        
+        if (!documentIds || !Array.isArray(documentIds) || documentIds.length === 0) {
+            return res.status(400).json({ success: false, error: '请提供要导出的文档ID列表' });
+        }
+        
+        const data = await loadData();
+        const documents = data.documents.filter(d => documentIds.includes(d.id));
+        
+        if (documents.length === 0) {
+            return res.status(404).json({ success: false, error: '未找到指定的文档' });
+        }
+        
+        // 导出文件夹路径
+        const exportDir = path.join(__dirname, '..', '..', 'exported data');
+        
+        // 确保导出文件夹存在
+        try {
+            await fs.access(exportDir);
+        } catch {
+            await fs.mkdir(exportDir, { recursive: true });
+        }
+        
+        const exportTime = getTimestamp();
+        const exportedFiles = [];
+        
+        // 为每个文档生成txt和csv文件
+        for (const doc of documents) {
+            // 生成txt文件
+            const txtContent = `文档名称: ${doc.name}
+文档描述: ${doc.description || '无'}
+创建时间: ${doc.createdAt}
+更新时间: ${doc.updatedAt}
+导出时间: ${exportTime}
+
+文档内容（古文原文）:
+${doc.content || ''}`;
+            
+            const txtFileName = `${doc.name.replace(/\.(txt|md)$/i, '')}.txt`;
+            const txtFilePath = path.join(exportDir, txtFileName);
+            await fs.writeFile(txtFilePath, txtContent, 'utf-8');
+            exportedFiles.push(txtFileName);
+            
+            // 生成csv文件
+            const csvLines = ['number,label,Instance'];
+            const annotations = doc.entityAnnotations || [];
+            
+            annotations.forEach((ann, index) => {
+                const number = index + 1;
+                const label = ann.label || '';
+                const instance = doc.content ? doc.content.slice(ann.start, ann.end) : '';
+                // CSV格式：如果字段包含逗号或引号，需要用引号包裹
+                const escapedInstance = instance.includes(',') || instance.includes('"') 
+                    ? `"${instance.replace(/"/g, '""')}"` 
+                    : instance;
+                csvLines.push(`${number},${label},${escapedInstance}`);
+            });
+            
+            const csvContent = csvLines.join('\n');
+            const csvFileName = `${doc.name.replace(/\.(txt|md)$/i, '')}+实体标注.csv`;
+            const csvFilePath = path.join(exportDir, csvFileName);
+            await fs.writeFile(csvFilePath, csvContent, 'utf-8');
+            exportedFiles.push(csvFileName);
+        }
+        
+        res.json({ 
+            success: true, 
+            message: `成功导出 ${documents.length} 个文档`,
+            exportedFiles,
+            exportCount: documents.length
+        });
+        
+    } catch (error) {
+        console.error('导出文档错误:', error);
+        res.status(500).json({ success: false, error: '服务器错误: ' + error.message });
+    }
+});
+
 // 启动服务器
 app.listen(PORT, () => {
     console.log('\n' + '='.repeat(50));

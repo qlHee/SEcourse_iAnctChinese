@@ -6,6 +6,7 @@ class UIManager {
         this.currentView = 'home';
         this.currentProjectId = null;
         this.currentProjectName = '';
+        this.exportMode = false; // 导出模式标志
         
         // DOM elements
         this.elements = {
@@ -105,6 +106,9 @@ class UIManager {
         // Document list buttons
         document.getElementById('create-document-btn').addEventListener('click', () => this.showCreateDocumentModal());
         document.getElementById('import-document-btn').addEventListener('click', () => this.showImportDocumentModal());
+        document.getElementById('select-all-docs-btn').addEventListener('click', () => this.toggleSelectAllDocs());
+        document.getElementById('export-documents-btn').addEventListener('click', () => this.handleExportClick());
+        document.getElementById('cancel-export-btn').addEventListener('click', () => this.cancelExportMode());
         document.getElementById('back-to-projects-btn').addEventListener('click', () => this.showHomeView());
         
         // Editor content
@@ -188,6 +192,11 @@ class UIManager {
         this.currentProjectId = null;
         this.currentProjectName = '';
         
+        // 退出导出模式
+        if (this.exportMode) {
+            this.cancelExportMode();
+        }
+        
         // 清除搜索状态
         this.currentProjectSearch = '';
         this.currentDocumentSearch = '';
@@ -208,6 +217,11 @@ class UIManager {
         this.currentView = 'documents';
         this.currentProjectId = projectId;
         this.currentProjectName = projectName;
+        
+        // 退出导出模式
+        if (this.exportMode) {
+            this.cancelExportMode();
+        }
         
         // 清除文档搜索状态
         this.currentDocumentSearch = '';
@@ -355,6 +369,7 @@ class UIManager {
             <div class="document-card">
                 <div class="document-info">
                     <div class="document-title-row">
+                        <input type="checkbox" class="doc-export-checkbox" data-doc-id="${doc.id}" style="margin-right: 8px; display: none;">
                         <span class="document-title">${sanitizeHTML(doc.name)}</span>
                         <span class="document-detail">${sanitizeHTML(doc.description || '')}</span>
                     </div>
@@ -853,6 +868,115 @@ class UIManager {
         if (confirm('确定删除该文档吗？')) {
             dataManager.deleteDocument(docId);
             this.showToast('文档删除成功', 'success');
+        }
+    }
+    
+    // 进入/退出导出模式
+    enterExportMode() {
+        this.exportMode = true;
+        // 显示所有复选框
+        const checkboxes = document.querySelectorAll('.doc-export-checkbox');
+        checkboxes.forEach(cb => cb.style.display = 'inline-block');
+        
+        // 显示全选和取消按钮
+        document.getElementById('select-all-docs-btn').style.display = 'inline-block';
+        document.getElementById('cancel-export-btn').style.display = 'inline-block';
+        
+        // 修改导出按钮文字
+        const exportBtn = document.getElementById('export-documents-btn');
+        exportBtn.innerHTML = '<i data-feather="check"></i> 确认导出';
+        feather.replace();
+    }
+    
+    cancelExportMode() {
+        this.exportMode = false;
+        // 隐藏所有复选框
+        const checkboxes = document.querySelectorAll('.doc-export-checkbox');
+        checkboxes.forEach(cb => {
+            cb.style.display = 'none';
+            cb.checked = false;
+        });
+        
+        // 隐藏全选和取消按钮
+        document.getElementById('select-all-docs-btn').style.display = 'none';
+        document.getElementById('cancel-export-btn').style.display = 'none';
+        
+        // 恢复导出按钮文字
+        const exportBtn = document.getElementById('export-documents-btn');
+        exportBtn.innerHTML = '<i data-feather="download"></i> 导出文档与标注';
+        feather.replace();
+    }
+    
+    // 全选/取消全选文档
+    toggleSelectAllDocs() {
+        const checkboxes = document.querySelectorAll('.doc-export-checkbox');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        checkboxes.forEach(cb => cb.checked = !allChecked);
+        
+        // 更新全选按钮文字
+        const selectAllBtn = document.getElementById('select-all-docs-btn');
+        if (allChecked) {
+            selectAllBtn.innerHTML = '<i data-feather="check-square"></i> 全选';
+        } else {
+            selectAllBtn.innerHTML = '<i data-feather="square"></i> 取消全选';
+        }
+        feather.replace();
+    }
+    
+    // 处理导出按钮点击
+    handleExportClick() {
+        if (!this.exportMode) {
+            // 进入选择模式
+            const documents = dataManager.getDocumentsByProject(this.currentProjectId);
+            if (documents.length === 0) {
+                this.showToast('当前项目没有文档可导出', 'warning');
+                return;
+            }
+            this.enterExportMode();
+        } else {
+            // 执行导出
+            this.executeExport();
+        }
+    }
+    
+    // 执行导出
+    async executeExport() {
+        if (!this.currentProjectId) {
+            this.showToast('无法确定当前项目', 'error');
+            return;
+        }
+        
+        // 获取所有选中的文档复选框
+        const checkboxes = document.querySelectorAll('.doc-export-checkbox:checked');
+        
+        if (checkboxes.length === 0) {
+            this.showToast('请先选择要导出的文档', 'warning');
+            return;
+        }
+        
+        // 获取选中的文档ID列表
+        const selectedDocIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-doc-id'));
+        
+        try {
+            const apiBase = dataManager.apiBase || 'http://localhost:5002';
+            const response = await fetch(`${apiBase}/api/export-documents`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ documentIds: selectedDocIds })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                this.showToast(`${result.message}，文件已保存到 exported data 文件夹`, 'success');
+                // 退出导出模式
+                this.cancelExportMode();
+            } else {
+                this.showToast(`导出失败: ${result.error}`, 'error');
+            }
+        } catch (error) {
+            console.error('导出文档错误:', error);
+            this.showToast('导出失败: ' + error.message, 'error');
         }
     }
     
