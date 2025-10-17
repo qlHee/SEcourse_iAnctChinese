@@ -124,7 +124,7 @@ if __name__ == '__main__':
         print('警告: 未设置 DEEPSEEK_API_KEY 环境变量!')
         print('请设置环境变量后重启服务:')
         print('  export DEEPSEEK_API_KEY=your_api_key_here')
-    print('服务地址: http://0.0.0.0:5007')
+    print('服务地址: http://0.0.0.0:5004')
     print('=' * 60)
-    app.run(host='0.0.0.0', port=5007, debug=False)
+    app.run(host='0.0.0.0', port=5004, debug=False)
 

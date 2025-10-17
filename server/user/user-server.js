@@ -1,7 +1,7 @@
 /**
  * 用户管理服务器 - Express 版本
  * 提供用户注册、登录、信息更新 API
- * 自动保存到 data/data.json 文件
+ * 自动保存到 database/data.json 文件
  */
 const express = require('express');
 const cors = require('cors');
@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5002;
 
 // 数据文件路径
-const DATA_FILE = path.join(__dirname, '..', 'data', 'data.json');
+const DATA_FILE = path.join(__dirname, '..', '..', 'database', 'data.json');
 
 // 中间件
 app.use(cors());
@@ -596,7 +596,7 @@ app.listen(PORT, () => {
     console.log('📁 数据文件:', DATA_FILE);
     console.log('='.repeat(50));
     console.log('✅ 功能: 用户注册、登录、信息更新');
-    console.log('✅ 数据: 自动保存到 data.json');
+    console.log('✅ 数据: 自动保存到 database/data.json');
     console.log('='.repeat(50) + '\n');
 });
 

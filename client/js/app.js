@@ -13,7 +13,7 @@ class App {
         
         // Setup logout button
         document.getElementById('logout-btn')?.addEventListener('click', () => {
-            if (confirm('确定要登出吗？')) {
+            if (confirm(t('confirm_logout'))) {
                 authManager.logout();
             }
         });

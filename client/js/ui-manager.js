@@ -7,6 +7,7 @@ class UIManager {
         this.currentProjectId = null;
         this.currentProjectName = '';
         this.exportMode = false; // 导出模式标志
+        this.currentLanguage = getCurrentLanguage(); // 当前语言
         
         // DOM elements
         this.elements = {
@@ -54,6 +55,7 @@ class UIManager {
         
         // Initialize
         this.initializeEventListeners();
+        this.applyLanguage(); // 应用当前语言
         this.renderProjects();
     }
     
@@ -233,7 +235,7 @@ class UIManager {
         this.elements.documentEditor.style.display = 'none';
         this.elements.editorButtons.style.display = 'none';
         
-        this.elements.documentListTitle.textContent = `${projectName} 的文档列表`;
+        this.elements.documentListTitle.textContent = `${projectName} ${t('document_list')}`;
         this.renderDocuments();
     }
     
@@ -264,11 +266,11 @@ class UIManager {
             if (this.currentProjectSearch) {
                 projectList.innerHTML = `
                     <div class="empty-state">
-                        <h3>未找到匹配的项目</h3>
-                        <p>没有找到包含 "${this.currentProjectSearch}" 的项目</p>
+                        <h3>${t('no_matching_projects')}</h3>
+                        <p>${t('no_projects_found')} "${this.currentProjectSearch}" 的项目</p>
                         <div style="margin-top: 20px;">
                             <button class="action-btn" onclick="document.getElementById('project-search').value=''; uiManager.currentProjectSearch=''; uiManager.renderProjects();">
-                                <i data-feather="x"></i> 清除搜索
+                                <i data-feather="x"></i> ${t('clear_search')}
                             </button>
                         </div>
                     </div>
@@ -276,11 +278,11 @@ class UIManager {
             } else {
                 projectList.innerHTML = `
                     <div class="empty-state">
-                        <h3>欢迎使用 iAnctChinese-Client！</h3>
-                        <p>您还没有创建任何项目，点击右上角的"新建项目"按钮开始创建您的第一个项目吧！</p>
+                        <h3>${t('welcome_title')}</h3>
+                        <p>${t('welcome_desc')}</p>
                         <div style="margin-top: 20px;">
                             <button class="create-btn" onclick="uiManager.showCreateProjectModal()">
-                                <i data-feather="plus"></i> 创建第一个项目
+                                <i data-feather="plus"></i> ${t('create_first_project')}
                             </button>
                         </div>
                     </div>
@@ -302,13 +304,13 @@ class UIManager {
                 </div>
                 <div class="project-actions">
                     <button class="action-btn" onclick="uiManager.showDocumentListView('${project.id}', '${sanitizeHTML(project.name)}')">
-                        <i data-feather="folder"></i> 打开项目
+                        <i data-feather="folder"></i> ${t('open_project')}
                     </button>
                     <button class="action-btn" onclick="uiManager.showProjectDetails('${project.id}')">
-                        <i data-feather="info"></i> 项目详情
+                        <i data-feather="info"></i> ${t('project_details')}
                     </button>
                     <button class="action-btn delete-btn" onclick="uiManager.deleteProject('${project.id}')">
-                        <i data-feather="trash-2"></i> 删除项目
+                        <i data-feather="trash-2"></i> ${t('delete_project')}
                     </button>
                 </div>
             </div>
@@ -331,11 +333,11 @@ class UIManager {
             if (this.currentDocumentSearch) {
                 documentListContent.innerHTML = `
                     <div class="empty-state">
-                        <h3>未找到匹配的文档</h3>
-                        <p>没有找到包含 "${this.currentDocumentSearch}" 的文档</p>
+                        <h3>${t('no_matching_documents')}</h3>
+                        <p>${t('no_documents_found')} "${this.currentDocumentSearch}" 的文档</p>
                         <div style="margin-top: 20px;">
                             <button class="action-btn" onclick="document.getElementById('document-search').value=''; uiManager.currentDocumentSearch=''; uiManager.renderDocuments();">
-                                <i data-feather="x"></i> 清除搜索
+                                <i data-feather="x"></i> ${t('clear_search')}
                             </button>
                         </div>
                     </div>
@@ -343,18 +345,18 @@ class UIManager {
             } else {
                 documentListContent.innerHTML = `
                     <div class="empty-state">
-                        <h3>项目还没有文档</h3>
-                        <p>您可以通过以下方式添加文档：</p>
+                        <h3>${t('no_documents')}</h3>
+                        <p>${t('document_tips')}</p>
                         <ul style="text-align: left; margin: 20px 0;">
-                            <li>点击"新建文档"创建空白文档</li>
-                            <li>点击"导入文档"上传本地文件</li>
+                            <li>${t('create_blank_document')}</li>
+                            <li>${t('upload_local_file')}</li>
                         </ul>
                         <div style="margin-top: 20px;">
                             <button class="action-btn" onclick="uiManager.showCreateDocumentModal()">
-                                <i data-feather="plus"></i> 新建文档
+                                <i data-feather="plus"></i> ${t('new_document')}
                             </button>
                             <button class="action-btn" onclick="uiManager.showImportDocumentModal()">
-                                <i data-feather="upload"></i> 导入文档
+                                <i data-feather="upload"></i> ${t('import_document')}
                             </button>
                         </div>
                     </div>
@@ -377,16 +379,16 @@ class UIManager {
                 </div>
                 <div class="document-actions">
                     <button class="doc-btn" onclick="uiManager.showDocumentEditor('${doc.id}')">
-                        <i data-feather="folder"></i> 打开文档
+                        <i data-feather="folder"></i> ${t('open_document')}
                     </button>
                     <button class="doc-btn" onclick="uiManager.showDocumentDetails('${doc.id}')">
-                        <i data-feather="info"></i> 文档详情
+                        <i data-feather="info"></i> ${t('document_details')}
                     </button>
                     <button class="doc-btn" onclick="uiManager.showCopyDocumentModal('${doc.id}')">
-                        <i data-feather="copy"></i> 复制文档
+                        <i data-feather="copy"></i> ${t('copy_document')}
                     </button>
                     <button class="doc-btn delete-btn" onclick="uiManager.deleteDocument('${doc.id}')">
-                        <i data-feather="trash-2"></i> 删除文档
+                        <i data-feather="trash-2"></i> ${t('delete_document')}
                     </button>
                 </div>
             </div>
@@ -426,25 +428,26 @@ class UIManager {
     updateEditorContentForTab(tabName) {
         const content = this.elements.documentContent;
         
-        switch (tabName) {
-            case '实体标注':
-                content.placeholder = '请输入实体标注内容...';
-                this.toggleAnalysisSection(false);
-                this.toggleEntitySection(true);
-                this.toggleSegSection(false);  // 关闭自动分词面板
-                break;
-            case '古文解析':
-                content.placeholder = '请输入需要解析的古文内容...';
-                this.toggleAnalysisSection(true);
-                this.toggleEntitySection(false);
-                this.toggleSegSection(false);
-                break;
-            case '自动分词':
-                content.placeholder = '请输入需要进行分词的内容...';
-                this.toggleAnalysisSection(false);
-                this.toggleEntitySection(false);
-                this.toggleSegSection(true);
-                break;
+        // 匹配当前语言的标签名
+        const entityTab = t('entity_annotation');
+        const analysisTab = t('classical_analysis');
+        const segTab = t('auto_segmentation');
+        
+        if (tabName === entityTab || tabName === '实体标注') {
+            content.placeholder = t('enter_entity_content');
+            this.toggleAnalysisSection(false);
+            this.toggleEntitySection(true);
+            this.toggleSegSection(false);  // 关闭自动分词面板
+        } else if (tabName === analysisTab || tabName === '古文解析') {
+            content.placeholder = t('enter_analysis_content');
+            this.toggleAnalysisSection(true);
+            this.toggleEntitySection(false);
+            this.toggleSegSection(false);
+        } else if (tabName === segTab || tabName === '自动分词') {
+            content.placeholder = t('enter_segmentation_content');
+            this.toggleAnalysisSection(false);
+            this.toggleEntitySection(false);
+            this.toggleSegSection(true);
         }
     }
 
@@ -465,7 +468,7 @@ class UIManager {
     async runSegmentation() {
         const text = this.elements.documentContent?.value || '';
         if (!text.trim()) {
-            this.showToast('请输入文本后再分词', 'warning');
+            this.showToast(t('input_text_first'), 'warning');
             return;
         }
         if (this.elements.segStatus) this.elements.segStatus.style.display = 'block';
@@ -473,10 +476,10 @@ class UIManager {
         try {
             const tokens = await this.callSegmentAPI(text);
             this.renderSegList(tokens);
-            this.showToast('分词完成', 'success');
+            this.showToast(t('segmentation_complete'), 'success');
         } catch (err) {
             console.error(err);
-            this.showToast(`分词失败：${err.message || err}`, 'error');
+            this.showToast(`${t('segmentation_complete').replace('完成', '失败').replace('complete', 'failed')}：${err.message || err}`, 'error');
         } finally {
             if (this.elements.segStatus) this.elements.segStatus.style.display = 'none';
         }
@@ -501,7 +504,10 @@ class UIManager {
     renderSegList(tokens) {
         if (!this.elements.segList) return;
         if (!Array.isArray(tokens) || tokens.length === 0) {
-            this.elements.segList.textContent = '（无分词结果）';
+            const lang = getCurrentLanguage();
+            const msg = lang === 'English' ? '(No segmentation result)' :
+                       lang === '繁體中文' ? '（無分詞結果）' : '（无分词结果）';
+            this.elements.segList.textContent = msg;
             return;
         }
         const html = tokens.map((t, i) => {
@@ -514,7 +520,7 @@ class UIManager {
         this.elements.segList.querySelectorAll('.seg-token').forEach(el => {
             el.addEventListener('click', () => {
                 const token = el.textContent || '';
-                navigator.clipboard.writeText(token).then(() => this.showToast(`已复制：${token}`, 'info'));
+                navigator.clipboard.writeText(token).then(() => this.showToast(`${t('copied')}：${token}`, 'info'));
             });
         });
     }
@@ -523,20 +529,20 @@ class UIManager {
         if (!this.elements.segList) return;
         const tokens = Array.from(this.elements.segList.querySelectorAll('.seg-token')).map(el => el.textContent || '');
         if (tokens.length === 0) {
-            this.showToast('暂无可复制的分词结果', 'warning');
+            this.showToast(t('no_segmentation_result'), 'warning');
             return;
         }
         try {
             await navigator.clipboard.writeText(tokens.join(' '));
-            this.showToast('已复制分词序列', 'success');
+            this.showToast(t('segmentation_copied'), 'success');
         } catch (err) {
-            this.showToast('复制失败', 'error');
+            this.showToast(t('copy_failed'), 'error');
         }
     }
     async runClassicalAnalysis() {
         const text = this.elements.documentContent?.value?.trim() || '';
         if (!text) {
-            this.showToast('请输入需要解析的古文内容', 'warning');
+            this.showToast(t('input_analysis_text'), 'warning');
             return;
         }
         
@@ -552,10 +558,10 @@ class UIManager {
             if (this.elements.analysisResult) {
                 this.elements.analysisResult.innerHTML = this.formatResultHTML(result);
             }
-            this.showToast('解析完成', 'success');
+            this.showToast(t('analysis_complete'), 'success');
         } catch (err) {
             console.error(err);
-            this.showToast(`解析失败：${err.message || err}`, 'error');
+            this.showToast(`${t('analysis_complete').replace('完成', '失败').replace('complete', 'failed')}：${err.message || err}`, 'error');
         } finally {
             if (this.elements.analysisStatus) this.elements.analysisStatus.style.display = 'none';
         }
@@ -567,22 +573,22 @@ class UIManager {
             dialog.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
             dialog.innerHTML = `
                 <div style="background:white;border-radius:12px;padding:24px;min-width:320px;box-shadow:0 4px 20px rgba(0,0,0,0.15);">
-                    <h3 style="margin:0 0 16px 0;color:#1f2937;font-size:18px;">选择解析模型</h3>
+                    <h3 style="margin:0 0 16px 0;color:#1f2937;font-size:18px;">${t('select_model')}</h3>
                     <div style="margin-bottom:20px;">
                         <label style="display:block;margin-bottom:12px;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
                             <input type="radio" name="model" value="deepseek-chat" checked style="margin-right:8px;">
-                            <strong>DeepSeek-V3</strong> <span style="color:#10b981;font-size:12px;">(推荐)</span>
-                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">最新V3模型，速度快，效果好</div>
+                            <strong>${t('model_v3')}</strong> <span style="color:#10b981;font-size:12px;">${t('recommended')}</span>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">${t('model_v3_desc')}</div>
                         </label>
                         <label style="display:block;cursor:pointer;padding:12px;border:2px solid #e5e7eb;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e5e7eb'">
                             <input type="radio" name="model" value="deepseek-reasoner" style="margin-right:8px;">
-                            <strong>DeepSeek-R1</strong>
-                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">推理模型，深度分析，速度较慢</div>
+                            <strong>${t('model_r1')}</strong>
+                            <div style="font-size:13px;color:#6b7280;margin-top:4px;margin-left:24px;">${t('model_r1_desc')}</div>
                         </label>
                     </div>
                     <div style="display:flex;gap:12px;justify-content:flex-end;">
-                        <button id="model-cancel" style="padding:8px 20px;border:1px solid #d1d5db;background:white;border-radius:6px;cursor:pointer;font-size:14px;">取消</button>
-                        <button id="model-confirm" style="padding:8px 20px;border:none;background:#3b82f6;color:white;border-radius:6px;cursor:pointer;font-size:14px;">确定</button>
+                        <button id="model-cancel" style="padding:8px 20px;border:1px solid #d1d5db;background:white;border-radius:6px;cursor:pointer;font-size:14px;">${t('cancel')}</button>
+                        <button id="model-confirm" style="padding:8px 20px;border:none;background:#3b82f6;color:white;border-radius:6px;cursor:pointer;font-size:14px;">${t('confirm')}</button>
                     </div>
                 </div>
             `;
@@ -609,13 +615,13 @@ class UIManager {
     async submitQuestion() {
         const question = this.elements.qaInput?.value?.trim() || '';
         if (!question) {
-            this.showToast('请输入您的疑问', 'warning');
+            this.showToast(t('input_question'), 'warning');
             return;
         }
 
         const text = this.elements.documentContent?.value?.trim() || '';
         if (!text) {
-            this.showToast('请先输入古文内容', 'warning');
+            this.showToast(t('input_classical_text_first'), 'warning');
             return;
         }
 
@@ -629,17 +635,17 @@ class UIManager {
             const result = await this.callQAAPI(text, question, model);
             this.addQuestionToHistory(question, result);
             this.elements.qaInput.value = ''; // 清空输入框
-            this.showToast('答疑完成', 'success');
+            this.showToast(t('qa_complete'), 'success');
         } catch (err) {
             console.error(err);
-            this.showToast(`答疑失败：${err.message || err}`, 'error');
+            this.showToast(`${t('qa_complete').replace('完成', '失败').replace('complete', 'failed')}：${err.message || err}`, 'error');
         } finally {
             if (this.elements.qaStatus) this.elements.qaStatus.style.display = 'none';
         }
     }
 
     async callQAAPI(text, question, model) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5007') + '/api/qa';
+        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5004') + '/api/qa';
         const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -698,14 +704,14 @@ class UIManager {
         const selectionStart = textarea.selectionStart;
         const selectionEnd = textarea.selectionEnd;
         if (selectionEnd <= selectionStart) {
-            this.showToast('请先选中文本再打标', 'warning');
+            this.showToast(t('select_text_first'), 'warning');
             return;
         }
-        const label = this.elements.entityLabelSelect ? this.elements.entityLabelSelect.value : '实体';
+        const label = this.elements.entityLabelSelect ? this.elements.entityLabelSelect.value : t('other');
         const updated = dataManager.addEntityAnnotation(dataManager.editingDocId, { start: selectionStart, end: selectionEnd, label });
         if (updated) {
             this.renderEntityList();
-            this.showToast('已添加实体标注', 'success');
+            this.showToast(t('entity_added'), 'success');
         }
     }
 
@@ -714,7 +720,7 @@ class UIManager {
         const updated = dataManager.deleteEntityAnnotation(dataManager.editingDocId, index);
         if (updated) {
             this.renderEntityList();
-            this.showToast('已删除实体标注', 'success');
+            this.showToast(t('entity_deleted'), 'success');
         }
     }
 
@@ -741,7 +747,7 @@ class UIManager {
         feather.replace();
     }
     async callAnalyzeAPI(text, model) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5007') + '/api/analyze';
+        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5004') + '/api/analyze';
         const resp = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -774,19 +780,270 @@ class UIManager {
     }
     
     selectLanguage(lang) {
+        this.currentLanguage = lang;
+        setCurrentLanguage(lang);
         document.getElementById('language-btn').textContent = lang;
         this.closeLanguageDropdown();
-        // TODO: Implement actual language switching
+        this.applyLanguage();
+    }
+    
+    // 应用语言设置
+    applyLanguage() {
+        const lang = getCurrentLanguage();
+        
+        // 更新语言按钮显示
+        document.getElementById('language-btn').textContent = lang;
+        
+        // 更新Header
+        const headerTitle = document.querySelector('.header-title');
+        if (headerTitle) headerTitle.textContent = t('header_title');
+        
+        const saveDocBtn = document.getElementById('save-document-btn')?.querySelector('span');
+        if (saveDocBtn) saveDocBtn.textContent = t('save_document');
+        
+        const backToProjectBtn = document.getElementById('back-to-project-btn')?.querySelector('span');
+        if (backToProjectBtn) backToProjectBtn.textContent = t('back_to_project');
+        
+        const userInfoBtn = document.getElementById('user-info-btn');
+        if (userInfoBtn) userInfoBtn.textContent = t('user_info');
+        
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) logoutBtn.textContent = t('logout');
+        
+        // 更新主页面
+        const pageTitle = document.querySelector('.page-title');
+        if (pageTitle) pageTitle.textContent = t('project_management');
+        
+        const projectSearchInput = document.getElementById('project-search');
+        if (projectSearchInput) projectSearchInput.placeholder = t('search_project');
+        
+        const createProjectBtn = document.getElementById('create-project-btn');
+        if (createProjectBtn) {
+            const icon = createProjectBtn.querySelector('i');
+            createProjectBtn.innerHTML = '';
+            if (icon) createProjectBtn.appendChild(icon);
+            createProjectBtn.appendChild(document.createTextNode(' ' + t('new_project')));
+        }
+        
+        // 更新文档列表页面
+        const documentSearchInput = document.getElementById('document-search');
+        if (documentSearchInput) documentSearchInput.placeholder = t('search_document');
+        
+        const createDocBtn = document.getElementById('create-document-btn');
+        if (createDocBtn) {
+            const icon = createDocBtn.querySelector('i');
+            createDocBtn.innerHTML = '';
+            if (icon) createDocBtn.appendChild(icon);
+            createDocBtn.appendChild(document.createTextNode(' ' + t('new_document')));
+        }
+        
+        const importDocBtn = document.getElementById('import-document-btn');
+        if (importDocBtn) {
+            const icon = importDocBtn.querySelector('i');
+            importDocBtn.innerHTML = '';
+            if (icon) importDocBtn.appendChild(icon);
+            importDocBtn.appendChild(document.createTextNode(' ' + t('import_document')));
+        }
+        
+        const exportDocsBtn = document.getElementById('export-documents-btn');
+        if (exportDocsBtn && !this.exportMode) {
+            const icon = exportDocsBtn.querySelector('i');
+            exportDocsBtn.innerHTML = '';
+            if (icon) exportDocsBtn.appendChild(icon);
+            exportDocsBtn.appendChild(document.createTextNode(' ' + t('export_documents')));
+        }
+        
+        const backToProjectsBtn = document.getElementById('back-to-projects-btn');
+        if (backToProjectsBtn) {
+            const icon = backToProjectsBtn.querySelector('i');
+            backToProjectsBtn.innerHTML = '';
+            if (icon) backToProjectsBtn.appendChild(icon);
+            backToProjectsBtn.appendChild(document.createTextNode(' ' + t('back_to_project_list')));
+        }
+        
+        // 更新编辑器标签页
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        if (tabBtns.length >= 3) {
+            tabBtns[0].textContent = t('entity_annotation');
+            tabBtns[0].dataset.tab = t('entity_annotation');
+            tabBtns[1].textContent = t('classical_analysis');
+            tabBtns[1].dataset.tab = t('classical_analysis');
+            tabBtns[2].textContent = t('auto_segmentation');
+            tabBtns[2].dataset.tab = t('auto_segmentation');
+        }
+        
+        // 更新编辑器侧边栏
+        const docInfoTitle = document.querySelector('.sidebar-section h3');
+        if (docInfoTitle && docInfoTitle.textContent === '文档信息') {
+            docInfoTitle.textContent = t('document_name').replace(':', '');
+        }
+        
+        const docNameLabel = document.querySelector('label[for="editor-author"]')?.previousElementSibling;
+        if (docNameLabel) docNameLabel.textContent = t('document_name');
+        
+        const authorLabel = document.querySelector('label');
+        if (authorLabel && authorLabel.textContent.includes('作者')) {
+            authorLabel.textContent = t('author');
+        }
+        
+        const createdLabel = document.querySelector('label');
+        if (createdLabel && createdLabel.textContent.includes('创建时间')) {
+            createdLabel.textContent = t('created_at');
+        }
+        
+        // 更新侧边栏保存按钮
+        const sidebarSaveBtn = document.getElementById('save-document-sidebar-btn')?.querySelector('span');
+        if (sidebarSaveBtn) sidebarSaveBtn.textContent = ' ' + t('save');
+        
+        // 更新已保存状态
+        const saveStatus = document.getElementById('save-status');
+        if (saveStatus) saveStatus.textContent = '✓ ' + t('saved');
+        
+        // 更新快捷键提示
+        const shortcutHint = document.querySelector('.sidebar-section > div:last-child');
+        if (shortcutHint && shortcutHint.textContent.includes('快捷键')) {
+            shortcutHint.textContent = t('shortcut_key');
+        }
+        
+        // 更新实体标注部分
+        const entityTitle = document.querySelector('#entity-annotator h3');
+        if (entityTitle) entityTitle.textContent = t('entity_annotation');
+        
+        const labelLabel = document.querySelector('label[for="entity-label-select"]');
+        if (labelLabel) labelLabel.textContent = t('label');
+        
+        const entityLabelSelect = document.getElementById('entity-label-select');
+        if (entityLabelSelect) {
+            entityLabelSelect.options[0].text = t('person');
+            entityLabelSelect.options[1].text = t('place');
+            entityLabelSelect.options[2].text = t('time');
+            entityLabelSelect.options[3].text = t('object');
+            entityLabelSelect.options[4].text = t('concept');
+            entityLabelSelect.options[5].text = t('other');
+        }
+        
+        const addEntityBtn = document.getElementById('add-entity-btn');
+        if (addEntityBtn) {
+            const icon = addEntityBtn.querySelector('i');
+            addEntityBtn.innerHTML = '';
+            if (icon) addEntityBtn.appendChild(icon);
+            addEntityBtn.appendChild(document.createTextNode(' ' + t('add_entity')));
+        }
+        
+        // 更新分词部分
+        const segTitle = document.querySelector('#segmentation-section h3');
+        if (segTitle) segTitle.textContent = t('auto_segmentation');
+        
+        const runSegBtn = document.getElementById('run-seg-btn');
+        if (runSegBtn) {
+                const icon = runSegBtn.querySelector('i');
+            runSegBtn.innerHTML = '';
+            if (icon) runSegBtn.appendChild(icon);
+            runSegBtn.appendChild(document.createTextNode(' ' + t('run_segmentation')));
+        }
+        
+        const selectAllDocsBtn = document.getElementById('select-all-docs-btn');
+        if (selectAllDocsBtn) {
+            const icon = selectAllDocsBtn.querySelector('i');
+            selectAllDocsBtn.innerHTML = '';
+            if (icon) selectAllDocsBtn.appendChild(icon);
+            selectAllDocsBtn.appendChild(document.createTextNode(' ' + t('select_all')));
+        }
+        
+        const cancelExportBtn = document.getElementById('cancel-export-btn');
+        if (cancelExportBtn) {
+            const icon = cancelExportBtn.querySelector('i');
+            cancelExportBtn.innerHTML = '';
+            if (icon) cancelExportBtn.appendChild(icon);
+            cancelExportBtn.appendChild(document.createTextNode(' ' + t('cancel')));
+        }
+        
+        const copySegBtn = document.getElementById('copy-seg-btn');
+        if (copySegBtn) {
+            const icon = copySegBtn.querySelector('i');
+            copySegBtn.innerHTML = '';
+            if (icon) copySegBtn.appendChild(icon);
+            copySegBtn.appendChild(document.createTextNode(' ' + t('copy_sequence')));
+        }
+        
+        const segStatus = document.getElementById('seg-status');
+        if (segStatus) segStatus.textContent = t('segmenting');
+        
+        // 更新古文解析部分
+        const analysisTitle = document.querySelector('#analysis-section h3:first-child');
+        if (analysisTitle) analysisTitle.textContent = t('classical_analysis');
+        
+        const runAnalysisBtn = document.getElementById('run-analysis-btn');
+        if (runAnalysisBtn) {
+            const icon = runAnalysisBtn.querySelector('i');
+            runAnalysisBtn.innerHTML = '';
+            if (icon) runAnalysisBtn.appendChild(icon);
+            runAnalysisBtn.appendChild(document.createTextNode(' ' + t('run_analysis')));
+        }
+        
+        const analysisStatus = document.getElementById('analysis-status');
+        if (analysisStatus) analysisStatus.textContent = t('analyzing');
+        
+        // 更新古文答疑部分
+        const qaTitle = document.querySelector('#analysis-section h3:last-of-type');
+        if (qaTitle && qaTitle.textContent.includes('答疑')) {
+            qaTitle.textContent = t('qa_title');
+        }
+        
+        const qaInput = document.getElementById('qa-input');
+        if (qaInput) qaInput.placeholder = t('qa_input_placeholder');
+        
+        const qaSubmitBtn = document.getElementById('qa-submit-btn');
+        if (qaSubmitBtn) {
+            const icon = qaSubmitBtn.querySelector('i');
+            qaSubmitBtn.innerHTML = '';
+            if (icon) qaSubmitBtn.appendChild(icon);
+            qaSubmitBtn.appendChild(document.createTextNode(' ' + t('ask_question')));
+        }
+        
+        const qaStatus = document.getElementById('qa-status');
+        if (qaStatus) qaStatus.textContent = t('answering');
+        
+        // 更新placeholder
+        const documentContent = document.getElementById('document-content');
+        if (documentContent) {
+            const activeTab = document.querySelector('.tab-btn.active');
+            if (activeTab) {
+                const tabText = activeTab.textContent;
+                if (tabText.includes('实体') || tabText.includes('Entity')) {
+                    documentContent.placeholder = t('enter_entity_content');
+                } else if (tabText.includes('解析') || tabText.includes('Analysis')) {
+                    documentContent.placeholder = t('enter_analysis_content');
+                } else if (tabText.includes('分词') || tabText.includes('Segmentation')) {
+                    documentContent.placeholder = t('enter_segmentation_content');
+                } else {
+                    documentContent.placeholder = t('enter_content');
+                }
+            }
+        }
+        
+        const editorAuthor = document.getElementById('editor-author');
+        if (editorAuthor) editorAuthor.placeholder = t('enter_author');
+        
+        // 重新渲染当前视图以更新动态内容
+        if (this.currentView === 'home') {
+            this.renderProjects();
+        } else if (this.currentView === 'documents') {
+            this.renderDocuments();
+        }
+        
+        // 重新初始化feather图标
+        feather.replace();
     }
     
     // Project actions
     showCreateProjectModal() {
-        this.showModal('新建项目', [
-            { name: 'name', label: '项目名称', type: 'text', required: true },
-            { name: 'description', label: '项目描述', type: 'textarea' }
+        this.showModal(t('create_project'), [
+            { name: 'name', label: t('project_name'), type: 'text', required: true },
+            { name: 'description', label: t('project_description'), type: 'textarea' }
         ], (data) => {
             dataManager.addProject(data);
-            this.showToast('项目创建成功', 'success');
+            this.showToast(t('project_created'), 'success');
         });
     }
     
@@ -794,21 +1051,21 @@ class UIManager {
         const project = dataManager.getProject(projectId);
         if (!project) return;
         
-        this.showModal('项目详情', [
-            { name: 'name', label: '项目名称', type: 'text' },
-            { name: 'description', label: '项目描述', type: 'textarea' },
-            { name: 'createdAt', label: '创建时间', type: 'text', readOnly: true },
-            { name: 'updatedAt', label: '更新时间', type: 'text', readOnly: true }
+        this.showModal(t('project_details'), [
+            { name: 'name', label: t('project_name'), type: 'text' },
+            { name: 'description', label: t('project_description'), type: 'textarea' },
+            { name: 'createdAt', label: t('created_at'), type: 'text', readOnly: true },
+            { name: 'updatedAt', label: t('update_time'), type: 'text', readOnly: true }
         ], (data) => {
             dataManager.updateProject(projectId, data);
-            this.showToast('项目更新成功', 'success');
+            this.showToast(t('project_updated'), 'success');
         }, project);
     }
     
     deleteProject(projectId) {
-        if (confirm('确定删除该项目吗？这将同时删除项目下的所有文档。')) {
+        if (confirm(t('confirm_delete_project'))) {
             dataManager.deleteProject(projectId);
-            this.showToast('项目删除成功', 'success');
+            this.showToast(t('project_deleted'), 'success');
             if (this.currentProjectId === projectId) {
                 this.showHomeView();
             }
@@ -819,15 +1076,15 @@ class UIManager {
     showCreateDocumentModal() {
         if (!this.currentProjectId) return;
         
-        this.showModal('新建文档', [
-            { name: 'name', label: '文档名称', type: 'text', required: true },
-            { name: 'description', label: '文档描述', type: 'textarea' }
+        this.showModal(t('create_document'), [
+            { name: 'name', label: t('document_name').replace(':', ''), type: 'text', required: true },
+            { name: 'description', label: t('document_description'), type: 'textarea' }
         ], (data) => {
             dataManager.addDocument({
                 projectId: this.currentProjectId,
                 ...data
             });
-            this.showToast('文档创建成功', 'success');
+            this.showToast(t('document_created'), 'success');
         });
     }
     
@@ -835,14 +1092,14 @@ class UIManager {
         const doc = dataManager.getDocument(docId);
         if (!doc) return;
         
-        this.showModal('文档详情', [
-            { name: 'name', label: '文档名称', type: 'text' },
-            { name: 'description', label: '文档描述', type: 'textarea' },
-            { name: 'createdAt', label: '创建时间', type: 'text', readOnly: true },
-            { name: 'updatedAt', label: '更新时间', type: 'text', readOnly: true }
+        this.showModal(t('document_details'), [
+            { name: 'name', label: t('document_name').replace(':', ''), type: 'text' },
+            { name: 'description', label: t('document_description'), type: 'textarea' },
+            { name: 'createdAt', label: t('created_at').replace(':', ''), type: 'text', readOnly: true },
+            { name: 'updatedAt', label: t('update_time'), type: 'text', readOnly: true }
         ], (data) => {
             dataManager.updateDocument(docId, data);
-            this.showToast('文档更新成功', 'success');
+            this.showToast(t('document_updated'), 'success');
         }, doc);
     }
     
@@ -850,8 +1107,8 @@ class UIManager {
         const doc = dataManager.getDocument(docId);
         if (!doc) return;
         
-        this.showModal(`复制：${doc.name}`, [
-            { name: 'name', label: '新名称', type: 'text', required: true }
+        this.showModal(`${t('copy')}：${doc.name}`, [
+            { name: 'name', label: t('new_name'), type: 'text', required: true }
         ], (data) => {
             dataManager.addDocument({
                 projectId: doc.projectId,
@@ -860,14 +1117,14 @@ class UIManager {
                 content: doc.content,
                 author: doc.author
             });
-            this.showToast('文档复制成功', 'success');
-        }, { name: `${doc.name} - 复制` });
+            this.showToast(t('document_created'), 'success');
+        }, { name: `${doc.name} - ${t('copy')}` });
     }
     
     deleteDocument(docId) {
-        if (confirm('确定删除该文档吗？')) {
+        if (confirm(t('confirm_delete_document'))) {
             dataManager.deleteDocument(docId);
-            this.showToast('文档删除成功', 'success');
+            this.showToast(t('document_deleted'), 'success');
         }
     }
     
@@ -884,7 +1141,7 @@ class UIManager {
         
         // 修改导出按钮文字
         const exportBtn = document.getElementById('export-documents-btn');
-        exportBtn.innerHTML = '<i data-feather="check"></i> 确认导出';
+        exportBtn.innerHTML = `<i data-feather="check"></i> ${t('confirm_export')}`;
         feather.replace();
     }
     
@@ -903,7 +1160,7 @@ class UIManager {
         
         // 恢复导出按钮文字
         const exportBtn = document.getElementById('export-documents-btn');
-        exportBtn.innerHTML = '<i data-feather="download"></i> 导出文档与标注';
+        exportBtn.innerHTML = `<i data-feather="download"></i> ${t('export_documents')}`;
         feather.replace();
     }
     
@@ -916,9 +1173,9 @@ class UIManager {
         // 更新全选按钮文字
         const selectAllBtn = document.getElementById('select-all-docs-btn');
         if (allChecked) {
-            selectAllBtn.innerHTML = '<i data-feather="check-square"></i> 全选';
+            selectAllBtn.innerHTML = `<i data-feather="check-square"></i> ${t('select_all')}`;
         } else {
-            selectAllBtn.innerHTML = '<i data-feather="square"></i> 取消全选';
+            selectAllBtn.innerHTML = `<i data-feather="square"></i> ${t('deselect_all')}`;
         }
         feather.replace();
     }
@@ -929,7 +1186,10 @@ class UIManager {
             // 进入选择模式
             const documents = dataManager.getDocumentsByProject(this.currentProjectId);
             if (documents.length === 0) {
-                this.showToast('当前项目没有文档可导出', 'warning');
+                const lang = getCurrentLanguage();
+                const msg = lang === 'English' ? 'No documents to export in current project' :
+                           lang === '繁體中文' ? '當前項目沒有文檔可導出' : '当前项目没有文档可导出';
+                this.showToast(msg, 'warning');
                 return;
             }
             this.enterExportMode();
@@ -950,7 +1210,10 @@ class UIManager {
         const checkboxes = document.querySelectorAll('.doc-export-checkbox:checked');
         
         if (checkboxes.length === 0) {
-            this.showToast('请先选择要导出的文档', 'warning');
+            const lang = getCurrentLanguage();
+            const msg = lang === 'English' ? 'Please select documents to export first' :
+                       lang === '繁體中文' ? '請先選擇要導出的文檔' : '请先选择要导出的文档';
+            this.showToast(msg, 'warning');
             return;
         }
         
@@ -968,15 +1231,25 @@ class UIManager {
             const result = await response.json();
             
             if (result.success) {
-                this.showToast(`${result.message}，文件已保存到 exported data 文件夹`, 'success');
+                const lang = getCurrentLanguage();
+                const msg = lang === 'English' ? `${result.message}, files saved to exported data folder` :
+                           lang === '繁體中文' ? `${result.message}，文件已保存到 exported data 文件夾` :
+                           `${result.message}，文件已保存到 exported data 文件夹`;
+                this.showToast(msg, 'success');
                 // 退出导出模式
                 this.cancelExportMode();
             } else {
-                this.showToast(`导出失败: ${result.error}`, 'error');
+                const lang = getCurrentLanguage();
+                const prefix = lang === 'English' ? 'Export failed' :
+                              lang === '繁體中文' ? '導出失敗' : '导出失败';
+                this.showToast(`${prefix}: ${result.error}`, 'error');
             }
         } catch (error) {
             console.error('导出文档错误:', error);
-            this.showToast('导出失败: ' + error.message, 'error');
+            const lang = getCurrentLanguage();
+            const prefix = lang === 'English' ? 'Export failed' :
+                          lang === '繁體中文' ? '導出失敗' : '导出失败';
+            this.showToast(`${prefix}: ` + error.message, 'error');
         }
     }
     
@@ -1001,7 +1274,7 @@ class UIManager {
             
             const savedDoc = await dataManager.saveEditingDocument();
             if (savedDoc) {
-                this.showToast('文档保存成功', 'success');
+                this.showToast(t('document_saved'), 'success');
                 this.showSaveStatus();
                 
                 // 强制确保留在编辑器页面
@@ -1011,11 +1284,11 @@ class UIManager {
                 this.elements.documentEditor.style.display = 'block';
                 this.elements.editorButtons.style.display = 'flex';
             } else {
-                this.showToast('保存失败', 'error');
+                this.showToast(t('save_failed'), 'error');
             }
         } catch (error) {
             console.error('保存文档错误:', error);
-            this.showToast('保存失败: ' + error.message, 'error');
+            this.showToast(t('save_failed') + ': ' + error.message, 'error');
         }
     }
     
@@ -1101,12 +1374,18 @@ class UIManager {
         // Submit
         document.getElementById('import-submit').onclick = async () => {
             if (selectedFiles.length === 0) {
-                this.showToast('请选择要导入的文件', 'warning');
+                const lang = getCurrentLanguage();
+                const msg = lang === 'English' ? 'Please select files to import' :
+                           lang === '繁體中文' ? '請選擇要導入的文件' : '请选择要导入的文件';
+                this.showToast(msg, 'warning');
                 return;
             }
             
             const ids = await dataManager.importDocuments(selectedFiles, this.currentProjectId);
-            this.showToast(`成功导入 ${ids.length} 个文档`, 'success');
+            const lang = getCurrentLanguage();
+            const msg = lang === 'English' ? `Successfully imported ${ids.length} documents` :
+                       lang === '繁體中文' ? `成功導入 ${ids.length} 個文檔` : `成功导入 ${ids.length} 个文档`;
+            this.showToast(msg, 'success');
             modal.style.display = 'none';
         };
         
@@ -1183,7 +1462,7 @@ class UIManager {
                 onSubmit(formData);
                 modal.style.display = 'none';
             } else {
-                this.showToast('请填写所有必填字段', 'error');
+                this.showToast(t('fill_required_fields'), 'error');
             }
         };
         
