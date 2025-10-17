@@ -1,0 +1,23 @@
+{
+  "name": "ianct-chinese-backend",
+  "version": "1.0.0",
+  "description": "Backend services orchestrator for iAnctChinese",
+  "scripts": {
+    "start:user": "npm --prefix ./user start",
+    "start:ai:mac": "./AI/venv/bin/python ./AI/ai.py",
+    "start:ai:win": ".\\AI\\venv\\Scripts\\python.exe .\\AI\\ai.py",
+    "start:seg": "python ./seg/seg_server.py",
+    "start-backend:mac": "concurrently \"npm:start:user\" \"npm:start:ai:mac\" \"npm:start:seg\"",
+    "start-backend:win": "concurrently \"npm:start:user\" \"npm:start:ai:win\" \"npm:start:seg\""
+  },
+  "keywords": [
+    "backend",
+    "orchestrator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
