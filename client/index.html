@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iAnctChinese-Client</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/header.css">
+    <link rel="stylesheet" href="styles/home-content.css">
+    <link rel="stylesheet" href="styles/document-list.css">
+    <link rel="stylesheet" href="styles/document-editor.css">
+    <link rel="stylesheet" href="styles/modal-form.css">
+    <link rel="stylesheet" href="styles/toast.css">
+    <!-- Feather Icons CDN -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-title">汉语智能标注平台</div>
+        <div class="header-nav">
+            <!-- Editor buttons (hidden by default) -->
+            <div id="editor-buttons" class="editor-buttons" style="display: none;">
+                <button type="button" class="header-button" id="save-document-btn">
+                    <i data-feather="save"></i>
+                    <span>保存文档</span>
+                </button>
+                <button type="button" class="header-button" id="back-to-project-btn">
+                    <i data-feather="arrow-left"></i>
+                    <span>返回项目</span>
+                </button>
+            </div>
+            
+            <!-- Language dropdown -->
+            <div class="lang-wrapper">
+                <button class="header-button" id="language-btn">简体中文</button>
+                <div class="lang-dropdown" id="language-dropdown" style="display: none;">
+                    <div class="lang-item" data-lang="简体中文">简体中文</div>
+                    <div class="lang-item" data-lang="繁體中文">繁體中文</div>
+                    <div class="lang-item" data-lang="English">English</div>
+                </div>
+            </div>
+            
+            <button class="header-button" id="user-info-btn">个人信息</button>
+            <button class="header-button logout-button" id="logout-btn">登出</button>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="home-main">
+        <!-- Home Content (default view) -->
+        <div id="home-content" class="home-content">
+            <div class="page-header">
+                <h2 class="page-title">项目管理</h2>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" id="project-search" placeholder="搜索项目..." class="search-input">
+                        <i data-feather="search" class="search-icon"></i>
+                    </div>
+                    <button class="create-btn" id="create-project-btn">
+                        <i data-feather="plus"></i> 新建项目
+                    </button>
+                </div>
+            </div>
+            
+            <div class="project-list" id="project-list">
+                <!-- Projects will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Document List (hidden by default) -->
+        <div id="document-list-container" class="document-list-container" style="display: none;">
+            <div class="document-list-header">
+                <h2 class="document-list-title" id="document-list-title">项目文档列表</h2>
+                <div class="document-list-actions">
+                    <div class="search-box">
+                        <input type="text" id="document-search" placeholder="搜索文档..." class="search-input">
+                        <i data-feather="search" class="search-icon"></i>
+                    </div>
+                    <button class="action-btn" id="create-document-btn">
+                        <i data-feather="plus"></i> 新建文档
+                    </button>
+                    <button class="action-btn" id="import-document-btn">
+                        <i data-feather="upload"></i> 导入文档
+                    </button>
+                    <button class="action-btn" id="select-all-docs-btn" style="display: none;">
+                        <i data-feather="check-square"></i> 全选
+                    </button>
+                    <button class="action-btn" id="export-documents-btn">
+                        <i data-feather="download"></i> 导出文档与标注
+                    </button>
+                    <button class="action-btn" id="cancel-export-btn" style="display: none;">
+                        <i data-feather="x"></i> 取消
+                    </button>
+                    <button class="action-btn" id="back-to-projects-btn">
+                        <i data-feather="arrow-left"></i> 返回项目列表
+                    </button>
+                </div>
+            </div>
+            
+            <div class="document-list-content" id="document-list-content">
+                <!-- Documents will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Document Editor (hidden by default) -->
+        <div id="document-editor" class="document-editor" style="display: none;">
+            <div class="editor-header">
+                <h2 class="editor-title" id="editor-title">文档编辑器</h2>
+                    <div class="editor-tabs">
+                    <button class="tab-btn active" data-tab="实体标注">实体标注</button>
+                        <button class="tab-btn" data-tab="古文解析">古文解析</button>
+                        <button class="tab-btn" data-tab="自动分词">自动分词</button>
+                </div>
+            </div>
+            
+            <div class="editor-content">
+                <div class="editor-main">
+                    <div class="editor-toolbar">
+                        <button class="toolbar-btn">
+                            <i data-feather="bold"></i>
+                        </button>
+                        <button class="toolbar-btn">
+                            <i data-feather="italic"></i>
+                        </button>
+                        <button class="toolbar-btn">
+                            <i data-feather="underline"></i>
+                        </button>
+                        <button class="toolbar-btn" id="analyze-btn" title="解析古文">
+                            <i data-feather="cpu"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="editor-textarea">
+                        <textarea id="document-content" placeholder="请输入文档内容..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="editor-sidebar">
+                    <div class="sidebar-section">
+                        <h3>文档信息</h3>
+                        <div class="info-item">
+                            <label>文档名称:</label>
+                            <span id="editor-doc-name">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>作者:</label>
+                            <input type="text" id="editor-author" placeholder="请输入作者">
+                        </div>
+                        <div class="info-item">
+                            <label>创建时间:</label>
+                            <span id="editor-created-at">-</span>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <button type="button" class="action-btn primary" id="save-document-sidebar-btn" style="width: 100%;">
+                                <i data-feather="save"></i> 保存文档
+                            </button>
+                        </div>
+                        <div id="save-status" style="font-size: 11px; color: #10b981; margin-top: 6px; text-align: center; display: none;">
+                            ✓ 已保存
+                        </div>
+                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px; text-align: center;">
+                            快捷键: Ctrl/Cmd + S
+                        </div>
+                    </div>
+                    <div class="sidebar-section" id="entity-annotator" style="display: none;">
+                        <h3>实体标注</h3>
+                        <div class="info-item">
+                            <label>标签:</label>
+                            <select id="entity-label-select">
+                                <option value="人物">人物</option>
+                                <option value="地名">地名</option>
+                                <option value="时间">时间</option>
+                                <option value="器物">器物</option>
+                                <option value="概念">概念</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div style="margin:8px 0;">
+                            <button class="action-btn" id="add-entity-btn"><i data-feather="tag"></i> 对选中文本打标</button>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <h4 style="margin:6px 0;">标注列表</h4>
+                            <div id="entity-list" style="max-height:200px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:6px;background:#fafafa;"></div>
+                        </div>
+                    </div>
+                    <div class="sidebar-section" id="segmentation-section" style="display: none;">
+                        <h3>自动分词</h3>
+                        <div style="margin: 8px 0; display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="action-btn" id="run-seg-btn"><i data-feather="scissors"></i> 对当前内容分词</button>
+                            <button class="action-btn" id="copy-seg-btn"><i data-feather="copy"></i> 复制词序列</button>
+                        </div>
+                        <div id="seg-status" style="font-size:12px;color:#6b7280;display:none;">正在分词...</div>
+                        <div id="seg-list" style="white-space:normal;margin-top:8px;max-height:220px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:#fafafa;"></div>
+                    </div>
+                    <div class="sidebar-section" id="analysis-section" style="display: none;">
+                        <h3>古文解析</h3>
+                        <div style="margin: 8px 0;">
+                            <button class="action-btn" id="run-analysis-btn">
+                                <i data-feather="play"></i> 解析当前内容
+                            </button>
+                        </div>
+                        <div id="analysis-status" style="font-size:12px;color:#6b7280;display:none;">正在解析...</div>
+                        <div id="analysis-result" style="white-space:pre-wrap;margin-top:8px;max-height:220px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:#fafafa;">——</div>
+                        
+                        <!-- 古文答疑功能 -->
+                        <h3 style="margin-top:16px;">古文答疑</h3>
+                        <div style="margin: 8px 0;">
+                            <input type="text" id="qa-input" placeholder="输入您的疑问..." style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;margin-bottom:8px;">
+                            <button class="action-btn" id="qa-submit-btn" style="width:100%;">
+                                <i data-feather="help-circle"></i> 提问
+                            </button>
+                        </div>
+                        <div id="qa-status" style="font-size:12px;color:#6b7280;display:none;">正在答疑...</div>
+                        <div id="qa-history" style="margin-top:8px;max-height:300px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:#fafafa;">
+                            <div style="color:#9ca3af;font-size:13px;text-align:center;">暂无提问记录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Forms -->
+    <div id="modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal-form" id="modal-form">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">标题</h3>
+                <button class="modal-close" id="modal-close">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Form fields will be dynamically inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="modal-cancel">取消</button>
+                <button class="modal-btn primary" id="modal-submit">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Document Modal -->
+    <div id="import-modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="import-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">导入文档</h3>
+                <button class="modal-close" id="import-modal-close">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <i data-feather="upload" class="upload-icon"></i>
+                        <p>点击选择文件或拖拽文件到此处</p>
+                        <input type="file" id="file-input" multiple accept=".txt,.md,.doc,.docx" style="display: none;">
+                    </div>
+                </div>
+                <div class="file-list" id="file-list" style="display: none;">
+                    <!-- Selected files will be shown here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="import-cancel">取消</button>
+                <button class="modal-btn primary" id="import-submit">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profile-modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal-form" id="profile-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">个人信息</h3>
+                <button class="modal-close" id="profile-modal-close">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="profile-modal-body">
+                <div class="modal-field">
+                    <label for="profile-username">用户名</label>
+                    <input type="text" id="profile-username" readonly style="background: #f3f4f6; cursor: not-allowed;">
+                </div>
+                <div class="modal-field">
+                    <label for="profile-email">邮箱</label>
+                    <input type="email" id="profile-email" placeholder="请输入邮箱">
+                </div>
+                <div class="modal-field">
+                    <label for="profile-new-password">新密码（可选）</label>
+                    <input type="password" id="profile-new-password" placeholder="留空表示不修改密码">
+                </div>
+                <div class="modal-field">
+                    <label for="profile-confirm-password">确认新密码</label>
+                    <input type="password" id="profile-confirm-password" placeholder="再次输入新密码">
+                </div>
+                <div class="modal-field">
+                    <label>注册时间</label>
+                    <div id="profile-created-at" style="padding: 8px 0; color: #6b7280;">-</div>
+                </div>
+                <div class="modal-field">
+                    <label>最后登录</label>
+                    <div id="profile-last-login" style="padding: 8px 0; color: #6b7280;">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="profile-cancel">取消</button>
+                <button class="modal-btn primary" id="profile-save">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" style="display: none;">
+        <div class="toast-content">
+            <span id="toast-message">消息</span>
+            <button class="toast-close" id="toast-close">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // 登录保护
+        if (!authManager.requireLogin()) {
+            // 会自动跳转到登录页
+        } else {
+            // 显示当前用户信息
+            const user = authManager.getCurrentUser();
+            document.querySelector('.header-button:nth-last-child(2)').textContent = user.username;
+        }
+    </script>
+</body>
+</html>

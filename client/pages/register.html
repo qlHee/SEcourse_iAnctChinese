@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册账号 - iAnctChinese</title>
+    <link rel="stylesheet" href="../styles/login.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .lang-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .lang-selector select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-selector">
+        <select id="language-select">
+            <option value="简体中文">简体中文</option>
+            <option value="繁體中文">繁體中文</option>
+            <option value="English">English</option>
+        </select>
+    </div>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 id="register-title">注册账号</h1>
+                <p id="register-subtitle">加入古汉语智能标注平台</p>
+            </div>
+            
+            <form id="register-form" class="login-form">
+                <div class="form-group">
+                    <label for="username" id="username-label">
+                        <i data-feather="user"></i>
+                        <span>用户名</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="3-20个字符" 
+                        required 
+                        minlength="3"
+                        maxlength="20"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" id="email-label">
+                        <i data-feather="mail"></i>
+                        <span>邮箱</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="请输入邮箱地址" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" id="password-label">
+                        <i data-feather="lock"></i>
+                        <span>密码</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="至少6个字符" 
+                        required
+                        minlength="6"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password" id="confirm-password-label">
+                        <i data-feather="check-circle"></i>
+                        <span>确认密码</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        name="confirm-password" 
+                        placeholder="再次输入密码" 
+                        required
+                        minlength="6"
+                    >
+                </div>
+                
+                <button type="submit" class="login-btn" id="register-btn">
+                    <span id="register-text">注册</span>
+                    <span id="register-loading" style="display: none;">
+                        <i data-feather="loader" class="spin"></i> <span id="registering-text">注册中...</span>
+                    </span>
+                </button>
+                
+                <div id="error-message" class="error-message" style="display: none;"></div>
+                <div id="success-message" class="success-message" style="display: none;"></div>
+            </form>
+            
+            <div class="login-footer">
+                <p id="has-account-text">已有账号？<a href="login.html" class="register-link" id="login-link">立即登录</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // 应用语言设置
+        function applyLanguage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-select').value = lang;
+            
+            document.getElementById('register-title').textContent = t('register_title');
+            document.getElementById('register-subtitle').textContent = t('register_subtitle');
+            
+            const usernameLabel = document.querySelector('#username-label span');
+            if (usernameLabel) usernameLabel.textContent = t('username');
+            document.getElementById('username').placeholder = t('username_length');
+            
+            const emailLabel = document.querySelector('#email-label span');
+            if (emailLabel) emailLabel.textContent = t('email');
+            document.getElementById('email').placeholder = t('input_email');
+            
+            const passwordLabel = document.querySelector('#password-label span');
+            if (passwordLabel) passwordLabel.textContent = t('password').replace(':', '');
+            document.getElementById('password').placeholder = t('password_length');
+            
+            const confirmPasswordLabel = document.querySelector('#confirm-password-label span');
+            if (confirmPasswordLabel) confirmPasswordLabel.textContent = t('confirm_password');
+            document.getElementById('confirm-password').placeholder = t('reinput_password');
+            
+            document.getElementById('register-text').textContent = t('register');
+            document.getElementById('registering-text').textContent = t('registering');
+            
+            const hasAccountText = document.getElementById('has-account-text');
+            hasAccountText.innerHTML = t('has_account') + '<a href="login.html" class="register-link" id="login-link">' + t('login_now') + '</a>';
+        }
+        
+        // 语言选择器
+        document.getElementById('language-select').addEventListener('change', (e) => {
+            setCurrentLanguage(e.target.value);
+            applyLanguage();
+        });
+        
+        feather.replace();
+        applyLanguage();
+        
+        const form = document.getElementById('register-form');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const registerBtn = document.getElementById('register-btn');
+        const registerText = document.getElementById('register-text');
+        const registerLoading = document.getElementById('register-loading');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // 验证
+            if (username.length < 3 || username.length > 20) {
+                showError('用户名长度应在3-20个字符之间');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('密码至少需要6个字符');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('两次输入的密码不一致');
+                return;
+            }
+            
+            // 显示加载
+            registerBtn.disabled = true;
+            registerText.style.display = 'none';
+            registerLoading.style.display = 'inline-flex';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // 注册
+            const result = await authManager.register(username, email, password);
+            
+            if (result.success) {
+                showSuccess('注册成功！3秒后跳转到登录页...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+            } else {
+                showError(result.error);
+                registerBtn.disabled = false;
+                registerText.style.display = 'inline';
+                registerLoading.style.display = 'none';
+            }
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

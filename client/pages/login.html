@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - iAnctChinese</title>
+    <link rel="stylesheet" href="../styles/login.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .lang-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .lang-selector select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-selector">
+        <select id="language-select">
+            <option value="简体中文">简体中文</option>
+            <option value="繁體中文">繁體中文</option>
+            <option value="English">English</option>
+        </select>
+    </div>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 id="login-title">iAnctChinese</h1>
+                <p id="login-subtitle">古汉语智能标注平台</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username" id="username-label">
+                        <i data-feather="user"></i>
+                        <span>用户名</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="请输入用户名" 
+                        required 
+                        autocomplete="username"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" id="password-label">
+                        <i data-feather="lock"></i>
+                        <span>密码</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="请输入密码" 
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember-me">
+                        <span id="remember-me-text">记住我</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="login-btn" id="login-btn">
+                    <span id="login-text">登录</span>
+                    <span id="login-loading" style="display: none;">
+                        <i data-feather="loader" class="spin"></i> <span id="logging-in-text">登录中...</span>
+                    </span>
+                </button>
+                
+                <div id="error-message" class="error-message" style="display: none;"></div>
+            </form>
+            
+            <div class="login-footer">
+                <p id="no-account-text">还没有账号？<a href="register.html" class="register-link" id="register-link">立即注册</a></p>
+                <p style="margin-top: 8px; font-size: 11px;" id="default-account">默认账号：zontiks / 123456</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // 应用语言设置
+        function applyLanguage() {
+            const lang = getCurrentLanguage();
+            document.getElementById('language-select').value = lang;
+            
+            document.getElementById('login-title').textContent = t('login_title');
+            document.getElementById('login-subtitle').textContent = t('login_subtitle');
+            
+            const usernameLabel = document.querySelector('#username-label span');
+            if (usernameLabel) usernameLabel.textContent = t('username');
+            document.getElementById('username').placeholder = t('input_username');
+            
+            const passwordLabel = document.querySelector('#password-label span');
+            if (passwordLabel) passwordLabel.textContent = t('password').replace(':', '');
+            document.getElementById('password').placeholder = t('input_password');
+            
+            document.getElementById('remember-me-text').textContent = t('remember_me');
+            document.getElementById('login-text').textContent = t('login');
+            document.getElementById('logging-in-text').textContent = t('logging_in');
+            
+            const noAccountText = document.getElementById('no-account-text');
+            const registerLink = document.getElementById('register-link');
+            noAccountText.innerHTML = t('no_account') + '<a href="register.html" class="register-link" id="register-link">' + t('register_now') + '</a>';
+            
+            document.getElementById('default-account').textContent = t('default_account');
+        }
+        
+        // 语言选择器
+        document.getElementById('language-select').addEventListener('change', (e) => {
+            setCurrentLanguage(e.target.value);
+            applyLanguage();
+        });
+        
+        // 初始化图标
+        feather.replace();
+        
+        // 应用语言
+        applyLanguage();
+        
+        // 检查是否已登录
+        if (localStorage.getItem('currentUser')) {
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>
+
