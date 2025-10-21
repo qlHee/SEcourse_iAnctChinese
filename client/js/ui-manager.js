@@ -151,12 +151,6 @@ class UIManager {
         if (this.elements.addEntityBtn) {
             this.elements.addEntityBtn.addEventListener('click', () => this.addSelectedEntity());
         }
-        
-        // AI auto annotation
-        const autoAnnotateBtn = document.getElementById('auto-annotate-btn');
-        if (autoAnnotateBtn) {
-            autoAnnotateBtn.addEventListener('click', () => this.runAutoAnnotation());
-        }
 
         // Segmentation actions
         if (this.elements.runSegBtn) {
@@ -413,11 +407,6 @@ class UIManager {
                 this.elements.editorCreatedAt.textContent = doc.createdAt;
                 this.elements.documentContent.value = doc.content || '';
                 this.elements.editorAuthor.value = doc.author || '';
-                
-                // 重新渲染实体标注列表（如果实体标注功能正在显示）
-                if (this.elements.entityAnnotator && this.elements.entityAnnotator.style.display !== 'none') {
-                    this.renderEntityList();
-                }
             }
         }
     }
@@ -747,7 +736,7 @@ class UIManager {
                 <div class="entity-item" style="display:flex;align-items:center;justify-content:space-between;margin:4px 0;padding:4px 6px;border-radius:6px;background:#fff;border:1px solid #e5e7eb;" title="${title}">
                     <div style="font-size:12px;color:#374151;">
                         <span style="background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 4px;margin-right:6px;">${sanitizeHTML(ann.label)}</span>
-                        <span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 4px;">"${snippet}"</span>
+                        <span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 4px;">“${snippet}”</span>
                     </div>
                     <button class="doc-btn delete-btn" onclick="uiManager.deleteEntity(${idx})" style="margin-left:8px;">
                         <i data-feather="trash-2"></i>
@@ -756,75 +745,6 @@ class UIManager {
             `;
         }).join('');
         feather.replace();
-    }
-
-    async runAutoAnnotation() {
-        const text = this.elements.documentContent?.value?.trim() || '';
-        if (!text) {
-            this.showToast(t('input_text_first'), 'warning');
-            return;
-        }
-        
-        if (!dataManager.editingDocId) {
-            this.showToast('请先打开一个文档', 'warning');
-            return;
-        }
-        
-        // 显示加载状态
-        const autoAnnotateBtn = document.getElementById('auto-annotate-btn');
-        const originalHTML = autoAnnotateBtn.innerHTML;
-        autoAnnotateBtn.disabled = true;
-        autoAnnotateBtn.innerHTML = '<i data-feather="loader"></i> 标注中...';
-        feather.replace();
-        
-        try {
-            const annotations = await this.callAutoAnnotateAPI(text);
-            
-            if (annotations && annotations.length > 0) {
-                // 将标注添加到文档
-                for (const ann of annotations) {
-                    await dataManager.addEntityAnnotation(dataManager.editingDocId, {
-                        start: ann.start,
-                        end: ann.end,
-                        label: ann.label
-                    });
-                }
-                
-                this.renderEntityList();
-                this.showToast(`AI自动标注完成，共标注 ${annotations.length} 个实体`, 'success');
-            } else {
-                this.showToast('AI未找到可标注的实体', 'info');
-            }
-        } catch (err) {
-            console.error('AI自动标注错误:', err);
-            this.showToast(`AI自动标注失败：${err.message || err}`, 'error');
-        } finally {
-            // 恢复按钮状态
-            autoAnnotateBtn.disabled = false;
-            autoAnnotateBtn.innerHTML = originalHTML;
-            feather.replace();
-        }
-    }
-    
-    async callAutoAnnotateAPI(text) {
-        const endpoint = (window.IANCT_API_BASE || 'http://localhost:5004') + '/api/auto-annotate';
-        const resp = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
-        });
-        
-        if (!resp.ok) {
-            let detail = '';
-            try {
-                const errorData = await resp.json();
-                detail = errorData.error || '';
-            } catch {}
-            throw new Error(detail || `HTTP ${resp.status}`);
-        }
-        
-        const data = await resp.json();
-        return data.annotations || [];
     }
     async callAnalyzeAPI(text, model) {
         const endpoint = (window.IANCT_API_BASE || 'http://localhost:5004') + '/api/analyze';
