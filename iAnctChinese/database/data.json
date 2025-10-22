@@ -1,0 +1,447 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "zontiks",
+      "email": "admin12@example.com",
+      "password": "123456",
+      "created_at": "2025-10-15 12:00:00",
+      "last_login": "2025-10-17 04:25:32",
+      "is_active": true
+    },
+    {
+      "id": 2,
+      "username": "zzz",
+      "email": "2848685684@qq.com",
+      "password": "123456",
+      "created_at": "2025-10-15 01:10:05",
+      "last_login": "2025-10-15 02:41:57",
+      "is_active": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "1760492180723k2lri3e3e",
+      "userId": 1,
+      "name": "a",
+      "description": "这是项目a的项目描述测试\naaa",
+      "createdAt": "2025-10-15 01:36:20",
+      "updatedAt": "2025-10-16 11:27:38"
+    },
+    {
+      "id": "1760496128476qn0wn3yfc",
+      "userId": 2,
+      "name": "k",
+      "description": "",
+      "createdAt": "2025-10-15 02:42:08",
+      "updatedAt": "2025-10-15 02:42:08"
+    },
+    {
+      "id": "1760614073706esgu7hls2",
+      "userId": 1,
+      "name": "b",
+      "description": "",
+      "createdAt": "2025-10-16 11:27:53",
+      "updatedAt": "2025-10-16 11:27:53"
+    }
+  ],
+  "documents": [
+    {
+      "id": "17604921936987mqc3yoij",
+      "userId": 1,
+      "projectId": "1760492180723k2lri3e3e",
+      "name": "左传",
+      "description": "",
+      "content": "青取之于蓝而胜于蓝",
+      "author": "",
+      "entityAnnotations": [
+        {
+          "start": 0,
+          "end": 1,
+          "label": "其他"
+        }
+      ],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-15 01:36:33",
+      "updatedAt": "2025-10-15 03:01:48"
+    },
+    {
+      "id": "1760495809617v78odiezt",
+      "userId": 1,
+      "projectId": "1760492180723k2lri3e3e",
+      "name": "论语",
+      "description": "",
+      "content": "君子曰学不可以已\n君子 曰 学 不 可以 已",
+      "author": "",
+      "entityAnnotations": [],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-15 02:36:49",
+      "updatedAt": "2025-10-15 03:00:27"
+    },
+    {
+      "id": "1760501682869d8gkibekj",
+      "userId": 1,
+      "projectId": "1760492180723k2lri3e3e",
+      "name": "六州歌头•东风著意.txt",
+      "description": "",
+      "content": "东风 著意 ， 先上 小桃枝 。 红粉 腻 ， 娇如醉 ， 倚 朱扉 。 记年 时 ， 隐映 新妆 面 ， 临 水岸 ， 春 将 半 ， 云 日暖 ， 斜桥 转 ， 夹 城西 。 草软莎平 ， 跋马 垂杨 渡 ， 玉勒争 嘶 。 认 娥眉 ， 凝 笑脸 ， 薄拂燕脂 。 绣户 曾 窥 ， 恨 依依 。 \n 共 携手 处 ， 香 如雾 ， 红 随步 ， 怨春迟 。 消瘦 损 ， 凭 谁 问 ？ 只花知 ， 泪空 垂 。 旧日 堂 前燕 ， 和 烟雨 ， 又 双飞 。 人自老 ， 春长 好 ， 梦 佳期 。 前度刘郎 ， 几许 风流 地 ， 花 也 应悲 。 但 茫茫 暮霭 ， 目断 武陵 溪 ， 往事 难 追 。",
+      "author": "",
+      "entityAnnotations": [
+        {
+          "start": 11,
+          "end": 14,
+          "label": "地名"
+        }
+      ],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-15 04:14:42",
+      "updatedAt": "2025-10-16 12:01:53"
+    },
+    {
+      "id": "17606142033722i6ryh2tr",
+      "userId": 1,
+      "projectId": "1760614073706esgu7hls2",
+      "name": "郑人买履.md",
+      "description": "",
+      "content": "郑人有欲买履者，先自度其足，而置之其坐。至之市，而忘操之。已得履，乃曰：“吾忘持度。”反归取之。及反，市罢，遂不得履。人曰：“何不试之以足？”曰：“宁信度，无自信也。”(郑人有欲买履者 一作：郑人有且置履者)",
+      "author": "",
+      "entityAnnotations": [
+        {
+          "start": 0,
+          "end": 2,
+          "label": "人物"
+        },
+        {
+          "start": 0,
+          "end": 1,
+          "label": "地名"
+        },
+        {
+          "start": 1,
+          "end": 2,
+          "label": "人物"
+        },
+        {
+          "start": 5,
+          "end": 6,
+          "label": "器物"
+        },
+        {
+          "start": 10,
+          "end": 11,
+          "label": "器物"
+        },
+        {
+          "start": 10,
+          "end": 11,
+          "label": "概念"
+        },
+        {
+          "start": 18,
+          "end": 19,
+          "label": "器物"
+        },
+        {
+          "start": 22,
+          "end": 23,
+          "label": "地名"
+        },
+        {
+          "start": 31,
+          "end": 32,
+          "label": "器物"
+        },
+        {
+          "start": 40,
+          "end": 41,
+          "label": "器物"
+        },
+        {
+          "start": 40,
+          "end": 41,
+          "label": "概念"
+        },
+        {
+          "start": 51,
+          "end": 52,
+          "label": "地名"
+        },
+        {
+          "start": 57,
+          "end": 58,
+          "label": "器物"
+        },
+        {
+          "start": 59,
+          "end": 60,
+          "label": "人物"
+        },
+        {
+          "start": 76,
+          "end": 77,
+          "label": "器物"
+        },
+        {
+          "start": 76,
+          "end": 77,
+          "label": "概念"
+        },
+        {
+          "start": 79,
+          "end": 81,
+          "label": "概念"
+        },
+        {
+          "start": 85,
+          "end": 87,
+          "label": "人物"
+        },
+        {
+          "start": 85,
+          "end": 86,
+          "label": "地名"
+        },
+        {
+          "start": 86,
+          "end": 87,
+          "label": "人物"
+        },
+        {
+          "start": 90,
+          "end": 91,
+          "label": "器物"
+        },
+        {
+          "start": 96,
+          "end": 98,
+          "label": "人物"
+        },
+        {
+          "start": 96,
+          "end": 97,
+          "label": "地名"
+        },
+        {
+          "start": 97,
+          "end": 98,
+          "label": "人物"
+        },
+        {
+          "start": 101,
+          "end": 102,
+          "label": "器物"
+        }
+      ],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-16 11:30:03",
+      "updatedAt": "2025-10-22 09:11:29"
+    },
+    {
+      "id": "1760668371420f1o3b8mr5",
+      "userId": 1,
+      "projectId": "1760614073706esgu7hls2",
+      "name": "桃花源记.txt",
+      "description": "",
+      "content": "《桃花源记》\n\n　　陶渊明\n\n　　晋太元中，武陵人捕鱼为业。缘溪行(xíng)，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之。复前行，欲穷其林。\n\n　　林尽水源，便得一山，山有小口，仿佛若有光。便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。土地平旷，屋舍俨(yǎn)然，有良田，美池，桑竹之属。阡陌(qiānmò)交通，鸡犬相闻。其中往来种作，男女衣着(zhuó)，悉如外人。黄发垂髫(tiáo)，并怡然自乐。\n\n　　见渔人，乃大惊，问所从来，具答之。便要(yāo)还家，为设酒杀鸡作食。村中闻有此人，咸来问讯。自云先世避秦时乱，率妻子邑人来此绝境，不复出焉，遂与外人间(jiàn)隔。问今是何世，乃不知有汉，无论魏晋。此人一一为具言所闻，皆叹惋。余人各复延至其家，皆出酒食。停数日，辞去。此中人语 (yù)云：“不足为外人道也。”\n\n　　既出，得其船，便扶向路，处处志之。及郡下，诣(yì)太守，说如此。太守即(jí)遣人随其往，寻向所志，遂迷，不复得路。\n\n　　南阳刘子骥(jì)，高尚士也，闻之，欣然规往。未果，寻病终，后遂无问津者。\n",
+      "author": "",
+      "entityAnnotations": [
+        {
+          "start": 269,
+          "end": 270,
+          "label": "人物"
+        },
+        {
+          "start": 22,
+          "end": 25,
+          "label": "人物"
+        },
+        {
+          "start": 17,
+          "end": 21,
+          "label": "时间"
+        },
+        {
+          "start": 390,
+          "end": 392,
+          "label": "时间"
+        },
+        {
+          "start": 48,
+          "end": 51,
+          "label": "地名"
+        },
+        {
+          "start": 264,
+          "end": 265,
+          "label": "地名"
+        },
+        {
+          "start": 53,
+          "end": 54,
+          "label": "地名"
+        },
+        {
+          "start": 230,
+          "end": 232,
+          "label": "人物"
+        },
+        {
+          "start": 115,
+          "end": 116,
+          "label": "器物"
+        },
+        {
+          "start": 280,
+          "end": 284,
+          "label": "概念"
+        },
+        {
+          "start": 368,
+          "end": 374,
+          "label": "其他"
+        }
+      ],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-17 02:32:51",
+      "updatedAt": "2025-10-22 09:12:46"
+    },
+    {
+      "id": "17606721331286623ueccw",
+      "userId": 1,
+      "projectId": "1760614073706esgu7hls2",
+      "name": "测试123",
+      "description": "",
+      "content": "测试内容1234567",
+      "author": "",
+      "entityAnnotations": [],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-17 03:35:33",
+      "updatedAt": "2025-10-22 09:11:37"
+    },
+    {
+      "id": "1761124334490ibxa4oeom",
+      "userId": 1,
+      "projectId": "1760614073706esgu7hls2",
+      "name": "腊日",
+      "description": "",
+      "content": "天欲雪，云满湖，楼台明灭山有无。\n水清出石鱼可数，林深无人鸟相呼。\n腊日不归对妻孥，名寻道人实自娱。\n道人之居在何许？宝云山前路盘纡。\n孤山孤绝谁肯庐？道人有道山不孤。\n纸窗竹屋深自暖，拥褐坐睡依团蒲。\n天寒路远愁仆夫，整驾催归及未晡。\n出山回望云木合，但见野鹘盘浮图。\n兹游淡薄欢有余，到家恍如梦遽遽。\n作诗火急追亡逋，清景一失后难摹。",
+      "author": "",
+      "entityAnnotations": [
+        {
+          "start": 8,
+          "end": 10,
+          "label": "器物"
+        },
+        {
+          "start": 34,
+          "end": 36,
+          "label": "时间"
+        },
+        {
+          "start": 39,
+          "end": 41,
+          "label": "人物"
+        },
+        {
+          "start": 44,
+          "end": 46,
+          "label": "人物"
+        },
+        {
+          "start": 44,
+          "end": 45,
+          "label": "概念"
+        },
+        {
+          "start": 51,
+          "end": 53,
+          "label": "人物"
+        },
+        {
+          "start": 51,
+          "end": 52,
+          "label": "概念"
+        },
+        {
+          "start": 59,
+          "end": 62,
+          "label": "地名"
+        },
+        {
+          "start": 68,
+          "end": 70,
+          "label": "地名"
+        },
+        {
+          "start": 76,
+          "end": 78,
+          "label": "人物"
+        },
+        {
+          "start": 76,
+          "end": 77,
+          "label": "概念"
+        },
+        {
+          "start": 79,
+          "end": 80,
+          "label": "概念"
+        },
+        {
+          "start": 85,
+          "end": 87,
+          "label": "器物"
+        },
+        {
+          "start": 87,
+          "end": 89,
+          "label": "器物"
+        },
+        {
+          "start": 94,
+          "end": 95,
+          "label": "器物"
+        },
+        {
+          "start": 98,
+          "end": 100,
+          "label": "器物"
+        },
+        {
+          "start": 107,
+          "end": 109,
+          "label": "人物"
+        },
+        {
+          "start": 115,
+          "end": 117,
+          "label": "时间"
+        },
+        {
+          "start": 132,
+          "end": 134,
+          "label": "器物"
+        },
+        {
+          "start": 140,
+          "end": 141,
+          "label": "概念"
+        },
+        {
+          "start": 154,
+          "end": 155,
+          "label": "器物"
+        },
+        {
+          "start": 161,
+          "end": 163,
+          "label": "概念"
+        }
+      ],
+      "relationAnnotations": [],
+      "createdAt": "2025-10-22 09:12:14",
+      "updatedAt": "2025-10-22 09:12:38"
+    }
+  ],
+  "annotations": []
+}

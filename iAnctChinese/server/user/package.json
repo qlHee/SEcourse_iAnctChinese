@@ -1,0 +1,25 @@
+{
+  "name": "ianct-chinese-user-server",
+  "version": "1.0.0",
+  "description": "用户管理后端服务 - Express 版本",
+  "main": "user-server.js",
+  "scripts": {
+    "start": "node user-server.js",
+    "dev": "nodemon user-server.js"
+  },
+  "keywords": [
+    "user",
+    "authentication",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+
