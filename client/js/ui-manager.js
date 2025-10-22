@@ -413,6 +413,11 @@ class UIManager {
                 this.elements.editorCreatedAt.textContent = doc.createdAt;
                 this.elements.documentContent.value = doc.content || '';
                 this.elements.editorAuthor.value = doc.author || '';
+                
+                // 重新渲染实体标注列表（如果实体标注功能正在显示）
+                if (this.elements.entityAnnotator && this.elements.entityAnnotator.style.display !== 'none') {
+                    this.renderEntityList();
+                }
             }
         }
     }
