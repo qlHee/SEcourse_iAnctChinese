@@ -6,7 +6,7 @@ DeepSeek API 配置文件
 
 # 在这里填写你的 DeepSeek API Key
 # 获取地址: https://platform.deepseek.com/
-DEEPSEEK_API_KEY = "sk-bb418b38c8b6441991d7300ba4a93868"
+DEEPSEEK_API_KEY = "YOUR_API_KEY_HERE"
 
 # API 配置
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
