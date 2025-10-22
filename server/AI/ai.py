@@ -114,6 +114,95 @@ def qa_text():
     except Exception as e:
         return jsonify({'error': f'生成回复时出错: {str(e)}'}), 500
 
+@app.route('/api/auto-annotate', methods=['POST'])
+def auto_annotate():
+    data = request.json
+    if not data or 'text' not in data:
+        return jsonify({'error': '请提供要标注的文本'}), 400
+    
+    input_text = data['text']
+    
+    prompt = f"""
+请对以下文本进行实体标注，标出所有的人物、地名、时间、器物、概念。
+
+文本："{input_text}"
+
+要求：
+1. 请标注出文中所有的人物（包括人名、称谓）
+2. 请标注出文中所有的地名（包括国名、地方名）
+3. 请标注出文中所有的时间（包括年代、季节、时辰等）
+4. 请标注出文中所有的器物（包括工具、物品、建筑等）
+5. 请标注出文中所有的概念（包括抽象概念、思想、制度等）
+
+请直接返回JSON格式的标注结果，格式如下：
+[
+  {{"text": "实体文本", "label": "人物"}},
+  {{"text": "实体文本", "label": "地名"}}
+]
+
+注意：
+- label 必须是以下之一：人物、地名、时间、器物、概念
+- text 是实体在原文中的确切文本
+- 只返回JSON数组，不要有其他文字说明
+"""
+    
+    try:
+        response = generate_response(prompt, DEEPSEEK_MODEL)
+        # 尝试解析返回的JSON
+        import json
+        import re
+        
+        # 清理可能的markdown代码块标记
+        cleaned = response.strip()
+        if cleaned.startswith('```'):
+            # 移除markdown代码块
+            cleaned = re.sub(r'^```(?:json)?\s*\n', '', cleaned)
+            cleaned = re.sub(r'\n```\s*$', '', cleaned)
+        
+        # 解析JSON
+        annotations = json.loads(cleaned)
+        
+        # 验证并清理数据
+        valid_labels = ['人物', '地名', '时间', '器物', '概念']
+        validated_annotations = []
+        
+        for ann in annotations:
+            if isinstance(ann, dict) and 'text' in ann and 'label' in ann:
+                # 确保label是有效的
+                if ann['label'] in valid_labels:
+                    entity_text = ann['text']
+                    # 在原文中查找实体的所有出现位置
+                    start = 0
+                    while True:
+                        pos = input_text.find(entity_text, start)
+                        if pos == -1:
+                            break
+                        # 找到一个匹配，添加到结果中
+                        validated_annotations.append({
+                            'start': pos,
+                            'end': pos + len(entity_text),
+                            'label': ann['label']
+                        })
+                        start = pos + 1
+        
+        # 去重：如果有完全相同的标注（start, end, label都相同），只保留一个
+        unique_annotations = []
+        seen = set()
+        for ann in validated_annotations:
+            key = (ann['start'], ann['end'], ann['label'])
+            if key not in seen:
+                seen.add(key)
+                unique_annotations.append(ann)
+        
+        # 按start位置排序
+        unique_annotations.sort(key=lambda x: x['start'])
+        
+        return jsonify({'annotations': unique_annotations})
+    except json.JSONDecodeError as e:
+        return jsonify({'error': f'AI返回的格式无法解析: {str(e)}', 'raw_response': response}), 500
+    except Exception as e:
+        return jsonify({'error': f'自动标注时出错: {str(e)}'}), 500
+
 if __name__ == '__main__':
     print('=' * 60)
     print('古文解析服务启动中...')
