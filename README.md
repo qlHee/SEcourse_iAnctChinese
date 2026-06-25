@@ -1,6 +1,7 @@
 # iAnctChinese
 
 汉语智能标注平台 - 古汉语文本处理与标注系统
+此项目被作为课程的团队项目继续开发，后续成果见https://github.com/likekiana/T3-BiograFi
 
 ## 项目简介
 
